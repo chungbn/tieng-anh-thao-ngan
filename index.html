@@ -58,6 +58,22 @@ button:focus-visible { outline: 3px solid var(--sky); outline-offset: 3px; }
 .btn.primary { background: var(--sky); border-color: var(--sky); color: #fff; }
 .btn.sun { background: var(--sun); border-color: var(--sun); color: #1d2742; }
 
+/* Hộp hỏi xác nhận (thay cho confirm() của trình duyệt) */
+.ask { border: 0; padding: 0; background: transparent; max-width: calc(100vw - 32px); width: 380px; color: var(--ink); }
+.ask::backdrop { background: rgba(20, 28, 50, .45); }
+.ask[open] { animation: askIn .18s ease-out; }
+@keyframes askIn { from { transform: scale(.92); opacity: 0; } }
+.ask-box { background: var(--card); border: 3px solid var(--sun); border-radius: 24px; padding: 22px 20px 18px; text-align: center; box-shadow: 0 12px 40px rgba(0, 0, 0, .25); }
+.ask-ico { font-size: 52px; line-height: 1; }
+.ask h3 { font-size: 26px; margin: 8px 0 4px; }
+.ask p { margin: 0; font-weight: 700; color: var(--muted); line-height: 1.4; }
+.ask-steps { display: flex; justify-content: center; gap: 8px; margin: 12px 0 0; }
+.ask-steps i { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--sun); }
+.ask-steps i.on { background: var(--sun); }
+.ask-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 18px; }
+.ask-row .btn { flex: 1 1 130px; font-family: var(--display); font-size: 18px; }
+@media (prefers-reduced-motion: reduce) { .ask[open] { animation: none; } }
+
 /* Header */
 .top { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; }
 .top .grow { flex: 1; min-width: 0; }
@@ -688,6 +704,27 @@ const unitStars = u => u.course.scored.reduce((n, g) => n + starsOf(u, g.k), 0);
 const starRow = n => `<span class="stars" aria-label="${n} trên 3 sao">${[1, 2, 3].map(i => `<span class="${i <= n ? "" : "off"}">⭐</span>`).join("")}</span>`;
 
 /* ---------- Màn hình ---------- */
+/* Hộp hỏi: askBox({ ico, title, text, steps?: [đã dùng, tổng], yes, no }) → Promise<true/false>.
+   Bấm nút, phím Esc hoặc chạm ra ngoài đều đóng hộp. */
+function askBox(o) {
+  return new Promise(done => {
+    const d = document.createElement("dialog");
+    d.className = "ask";
+    d.innerHTML = `<div class="ask-box">${o.ico ? `<div class="ask-ico">${o.ico}</div>` : ""}<h3>${o.title}</h3>${o.text ? `<p>${o.text}</p>` : ""}
+      ${o.steps ? `<div class="ask-steps" aria-label="Đã dùng ${o.steps[0]}/${o.steps[1]}">${Array.from({ length: o.steps[1] }, (_, i) => `<i class="${i < o.steps[0] ? "on" : ""}"></i>`).join("")}</div>` : ""}
+      <div class="ask-row"><button class="btn" data-v="0">${o.no || "Không"}</button><button class="btn ${o.yesCls || "sun"}" data-v="1">${o.yes || "Đồng ý"}</button></div></div>`;
+    let val = false;
+    d.onclick = e => {
+      const b = e.target.closest("button[data-v]");
+      if (b) { val = b.dataset.v === "1"; d.close(); }
+      else if (e.target === d) d.close();   // chạm vào nền mờ
+    };
+    d.onclose = () => { d.remove(); done(val); };
+    document.body.append(d);
+    d.showModal();
+    d.querySelector('[data-v="1"]').focus();
+  });
+}
 function go(fn) { stopSpeech(); fn(); window.scrollTo(0, 0); }
 
 function home() {
@@ -1537,7 +1574,9 @@ function examPage(T) {
   const fresh = () => go(() => examPage(makeExam(T.eow, T.sg)));
   document.getElementById("back").onclick = () => go(examSetup);
   document.getElementById("print").onclick = () => window.print();
-  document.getElementById("new").onclick = () => { if (T.done || real.every(i => i.sel == null) || confirm("Bỏ bài đang làm và tạo đề khác?")) fresh(); };
+  document.getElementById("new").onclick = async () => {
+    if (T.done || real.every(i => i.sel == null) || await askBox({ ico: "🔄", title: "Làm đề khác?", text: "Bài đang làm sẽ bị bỏ đi.", no: "Làm tiếp", yes: "Đề khác" })) fresh();
+  };
   document.getElementById("nm").oninput = e => store.set("x:name", e.target.value);
   if (T.done) {
     document.getElementById("new2").onclick = fresh;
@@ -1557,14 +1596,18 @@ function examPage(T) {
     p.items.forEach(o => { if (!o.ex && o.sel === j) o.sel = null; });
     it.sel = j; MS.q = MS.a = null;
   };
-  document.getElementById("exam").onclick = e => {
+  document.getElementById("exam").onclick = async e => {
     const sb = e.target.closest(".say[data-hs]");
     if (sb) { const [i, k] = sb.dataset.hs.split(":"); sayHint(byId[i], +k); return; }
     const hb = e.target.closest(".hintb[data-h]");
     if (hb) {
       const it = byId[hb.dataset.h], hl = it.hl || 0;
       if (hl >= 3) return;
-      if (!confirm(`Con muốn mở gợi ý ${hl + 1}/3 cho câu ${it.n} không?`)) return;
+      if (hb.dataset.busy) return;
+      hb.dataset.busy = 1;
+      const ok = await askBox({ ico: "💡", title: `Xem gợi ý ${hl + 1}?`, text: `Câu ${it.n}: con nghĩ thêm một chút đã nhé. Nếu vẫn khó thì mở gợi ý.`, steps: [hl, 3], no: "Con tự làm", yes: "Xem gợi ý" });
+      delete hb.dataset.busy;
+      if (!ok || (it.hl || 0) !== hl) return;
       it.hl = hl + 1;
       const h = it.hints[hl], p = partOf[it.id];
       if (h.cut && h.cut.includes(it.sel)) it.sel = null;
@@ -1603,9 +1646,9 @@ function examPage(T) {
   document.getElementById("exam").onkeydown = e => {
     if ((e.key === "Enter" || e.key === " ") && e.target.matches(".mq[role=button]")) { e.preventDefault(); e.target.click(); }
   };
-  document.getElementById("submit").onclick = () => {
+  document.getElementById("submit").onclick = async () => {
     const left = real.filter(i => i.sel == null).length;
-    if (left && !confirm(`Con còn ${left} câu chưa làm. Vẫn nộp bài nhé?`)) return;
+    if (left && !await askBox({ ico: "✋", title: `Còn ${left} câu chưa làm`, text: "Con có muốn nộp bài luôn không?", no: "Làm tiếp", yes: "Nộp bài", yesCls: "primary" })) return;
     T.done = true;
     go(() => examPage(T));
   };
