@@ -283,7 +283,6 @@ button:focus-visible { outline: 3px solid var(--sky); outline-offset: 3px; }
 .chs { display: grid; gap: 8px; }
 .chs.c3 { grid-template-columns: repeat(3, 1fr); }
 .chs.c2 { grid-template-columns: repeat(2, 1fr); max-width: 360px; }
-.chs.cl { grid-template-columns: repeat(auto-fill, minmax(44px, 1fr)); max-width: 380px; }
 .ch { display: flex; align-items: center; gap: 8px; min-width: 0; text-align: left; border: 3px solid var(--line); background: var(--card); border-radius: 16px; padding: 8px 10px; font-family: var(--display); font-weight: 700; font-size: 19px; line-height: 1.2; overflow-wrap: anywhere; position: relative; }
 .ch:disabled { cursor: default; color: var(--ink); -webkit-text-fill-color: currentColor; opacity: 1; }
 .ch .k { flex: none; width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--muted); display: grid; place-items: center; font-weight: 800; font-size: 15px; color: var(--muted); -webkit-text-fill-color: currentColor; }
@@ -292,13 +291,9 @@ button:focus-visible { outline: 3px solid var(--sky); outline-offset: 3px; }
 .ch.pico { justify-content: center; min-height: 96px; padding: 8px 4px; }
 .ch.pico .k { position: absolute; top: 6px; left: 6px; width: 26px; height: 26px; font-size: 13px; }
 .ch.pico .pic { font-size: 56px; }
-.ch.only { justify-content: center; padding: 6px 4px; }
-.ch.only .k { border: 0; width: auto; height: 28px; font-size: 20px; padding: 0 6px; border-radius: 10px; }
 .ch.big { justify-content: center; font-size: 30px; }
 .ch.right { border-color: var(--leaf); background: var(--ok-bg); }
 .ch.wrong { border-color: var(--tomato); background: var(--bad-bg); }
-.ansbox { display: grid; gap: 6px; background: var(--bg); border-radius: 16px; padding: 12px 14px; margin-top: 12px; font-family: var(--display); font-weight: 700; font-size: 19px; }
-.ansbox b { color: var(--sky); margin-right: 4px; }
 .blank { display: inline-block; min-width: .8em; border-bottom: 3px solid var(--sun); text-align: center; color: var(--sky); font-weight: 800; }
 .cnt { display: flex; flex-wrap: wrap; justify-content: center; align-content: center; font-size: 24px; padding: 4px; }
 .bdg { position: relative; display: inline-block; }
@@ -323,10 +318,52 @@ button:focus-visible { outline: 3px solid var(--sky); outline-offset: 3px; }
 .ch.cut { border-style: dashed; }
 .ch.cut > * { opacity: .25; }
 .ch.cut::after { content: "✕"; position: absolute; inset: 0; display: grid; place-items: center; font-size: 40px; color: var(--tomato); -webkit-text-fill-color: var(--tomato); text-decoration: none; }
-.ch.only.cut::after { font-size: 24px; }
+/* Bài nối cột: câu hỏi trái, câu trả lời phải, đường nối vẽ bằng SVG */
+.mgrid { position: relative; display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); column-gap: 64px; margin-top: 14px; }
+.mcol { display: grid; gap: 10px; align-content: start; position: relative; z-index: 1; }
+.mcol + .mcol { align-content: space-around; }
+.mlines { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; z-index: 2; }
+.mlines path { fill: none; stroke: var(--sky); stroke-width: 3; stroke-linecap: round; }
+.mlines path.ex { stroke: var(--muted); stroke-dasharray: 2 6; }
+.mlines path.ok { stroke: var(--leaf); }
+.mlines path.no { stroke: var(--tomato); }
+.mlines path.fix { stroke: var(--leaf); stroke-dasharray: 8 7; opacity: .8; }
+.mq, .ma { position: relative; border: 3px solid var(--line); background: var(--card); border-radius: 16px; padding: 8px 10px; min-width: 0; }
+.mq { display: grid; gap: 6px; cursor: pointer; }
+.mq.ex { opacity: .7; cursor: default; }
+.mq .qhead { flex-wrap: wrap; gap: 6px 8px; }
+.mq .qp { width: 64px; height: 56px; font-size: 38px; border-radius: 12px; }
+.mq .qt { font-size: 18px; }
+.mq .hints p { font-size: 14px; }
+.ma { display: flex; align-items: center; gap: 8px; text-align: left; font-family: var(--display); font-weight: 700; font-size: 17px; line-height: 1.2; overflow-wrap: anywhere; color: var(--ink); }
+.ma:disabled { cursor: default; opacity: 1; -webkit-text-fill-color: currentColor; }
+.ma .k { flex: none; width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--muted); display: grid; place-items: center; font-weight: 800; font-size: 14px; color: var(--muted); }
+.mq.on, .ma.on { border-color: var(--sun); box-shadow: 0 0 0 3px var(--sun); }
+.mq.linked, .ma.linked { border-color: var(--sky); }
+.ma.linked .k { background: var(--sky); border-color: var(--sky); color: #fff; }
+.mq.ex, .ma.linked:disabled { border-color: var(--line); }
+.ma.linked:disabled .k { background: var(--muted); border-color: var(--muted); }
+.ma.cut { border-style: dashed; }
+.ma.cut > :not(.dot) { opacity: .25; }
+.ma.cut::after { content: "✕"; position: absolute; inset: 0; display: grid; place-items: center; font-size: 28px; color: var(--tomato); -webkit-text-fill-color: var(--tomato); }
+.dot { position: absolute; top: 50%; width: 14px; height: 14px; margin-top: -7px; border-radius: 50%; background: var(--card); border: 3px solid var(--muted); }
+.mq .dot { right: -9px; }
+.ma .dot { left: -9px; }
+.linked .dot { border-color: var(--sky); background: var(--sky); }
+@media (max-width: 480px) {
+  .mgrid { grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); column-gap: 28px; }
+  .mq { padding: 7px 8px; }
+  .mq .hints p { padding: 6px 7px; gap: 4px; font-size: 13px; }
+  .mq .hints p > span > i { display: block; }
+  .mq .hints .say { width: 28px; height: 28px; font-size: 14px; }
+  .mq .qp { width: 52px; height: 46px; font-size: 30px; }
+  .mq .qt { font-size: 16px; }
+  .ma { font-size: 15px; padding: 7px 8px; gap: 6px; }
+  .mq .hintb { font-size: 13px; padding: 2px 8px; }
+}
 .xfoot { display: flex; gap: 12px; justify-content: center; align-items: center; flex-wrap: wrap; margin-top: 8px; }
-@media (min-width: 620px) {
-  .q.words { grid-template-columns: 170px 1fr; align-items: center; }
+@media (min-width: 720px) {
+  .q.words { grid-template-columns: auto minmax(0, 1fr); align-items: center; }
 }
 @media print {
   :root:not(#p) { --bg: #fff; --card: #fff; --line: #999; --ink: #000; --muted: #333; --shadow: none; --sky: #1d4f9c; --ok-bg: #fff; --bad-bg: #fff; color-scheme: light; }
@@ -339,6 +376,11 @@ button:focus-visible { outline: 3px solid var(--sky); outline-offset: 3px; }
   .ch.cut { border-style: solid; }
   .ch.cut > * { opacity: 1; }
   .ch.cut::after { display: none; }
+  .mgrid { break-inside: avoid; }
+  .mq.ex { opacity: 1; }
+  .mq.on, .ma.on { box-shadow: none; }
+  .ma.cut > :not(.dot) { opacity: 1; }
+  .ma.cut::after { display: none; }
   .ch, .qp { border-width: 1px; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } .burst { display: none; } }
@@ -496,10 +538,13 @@ const S = { vi: store.get("vi", true), slow: store.get("slow", true) };
 
 /* ---------- Giọng đọc & âm thanh ---------- */
 const hasTTS = "speechSynthesis" in window;
-let voice = null;
+let voice = null, viVoice = null;
 function pickVoice() {
   if (!hasTTS) return;
-  const vs = speechSynthesis.getVoices().filter(v => /^en[-_]/i.test(v.lang));
+  const all = speechSynthesis.getVoices(), vs = all.filter(v => /^en[-_]/i.test(v.lang));
+  // Giọng tiếng Việt để đọc lời gợi ý (Linh trên Mac/iPhone, Google Tiếng Việt trên Android/Chrome)
+  const vv = all.filter(v => /^vi([-_]|$)/i.test(v.lang));
+  viVoice = vv.find(v => /Linh|Google/i.test(v.name)) || vv[0] || null;
   const pref = ["Samantha", "Google US English", "Microsoft Aria", "Microsoft Jenny", "Karen", "Daniel"];
   voice = pref.map(p => vs.find(v => v.name.includes(p))).find(Boolean) || vs.find(v => /en[-_]US/i.test(v.lang)) || vs[0] || null;
 }
@@ -525,6 +570,10 @@ function clipsFor(text) {
 }
 function speak(text, onend) {
   stopSpeech();
+  playEn(text, onend);
+}
+// Phát tiếng Anh (file mp3 nếu có, không thì giọng trình duyệt) mà không dừng lượt đọc hiện tại, để nối nhiều đoạn
+function playEn(text, onend) {
   const id = speakId, clips = clipsFor(text);
   if (!clips) return ttsSpeak(text, onend);
   let fired = false;
@@ -554,6 +603,27 @@ function ttsSpeak(text, onend) {
     u.onend = once; setTimeout(once, 1200 + text.length * (S.slow ? 110 : 80));
   }
   speechSynthesis.speak(u);
+}
+function ttsVi(text, onend) {
+  if (!hasTTS) { onend && setTimeout(onend, 300); return; }
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = "vi-VN"; if (viVoice) u.voice = viVoice;
+  u.rate = S.slow ? 0.9 : 1;
+  let fired = false; const once = () => { if (!fired) { fired = true; onend && onend(); } };
+  u.onend = once; setTimeout(once, 1500 + text.length * 130);
+  speechSynthesis.speak(u);
+}
+/* Đọc nối các đoạn [{ en: true/false, t }]: đoạn tiếng Anh dùng file mp3/giọng Anh, đoạn tiếng Việt dùng giọng Việt */
+function speakSeq(segs) {
+  stopSpeech();
+  const id = speakId;
+  const next = i => {
+    if (id !== speakId || i >= segs.length) return;
+    const g = segs[i], go = () => setTimeout(() => next(i + 1), 150);
+    g.en ? playEn(g.t, go) : ttsVi(g.t, go);
+  };
+  next(0);
 }
 // Tên chữ cái, kèm âm của chữ nếu đã có file âm: "B. /b/ /b/"
 const sayLetter = l => hasSnd(l) ? `${l.L.toUpperCase()}. ${l.snd} ${l.snd}` : l.L.toUpperCase();
@@ -1092,8 +1162,8 @@ const PLACE_VI = { "in the tree": "trên cây", "on the flower": "trên bông ho
 const ACT_VI = { jump: "nhảy", run: "chạy", walk: "đi bộ" };
 function thisThat(c, s, p) {
   const x = c.pick(isNoun), far = s === "that";
-  if (Math.random() < .5) return { pic: P.one(x), q: `What's ${s}?`, ok: `It's ${an(x.en)}.`, bad: one([`They're ${plural(x.en)}.`, `It's ${wrongAn(x.en)}.`]), vi: far ? "Kia là cái gì?" : "Đây là cái gì?", tip: "Hỏi <b>một</b> vật → trả lời <b>It's a/an</b> + tên vật. " + TIP_AN };
-  return { pic: P.many(x.e, 3), q: `What are ${p}?`, ok: `They're ${plural(x.en)}.`, bad: one([`It's ${an(x.en)}.`, `They're ${x.en}.`]), vi: far ? "Những cái kia là gì?" : "Những cái này là gì?", tip: "Hỏi <b>nhiều</b> vật → trả lời <b>They're</b> + tên vật có thêm <b>s</b>." };
+  if (Math.random() < .5) return { pic: P.one(x), q: `What's ${s}?`, ok: `It's ${an(x.en)}.`, bad: one([`They're ${plural(x.en)}.`, `It's ${wrongAn(x.en)}.`]), vi: far ? "Kia là cái gì?" : "Đây là cái gì?", tip: "Hỏi <b lang=\"vi\">một</b> vật → trả lời <b>It's a/an</b> + tên vật. " + TIP_AN };
+  return { pic: P.many(x.e, 3), q: `What are ${p}?`, ok: `They're ${plural(x.en)}.`, bad: one([`It's ${an(x.en)}.`, `They're ${x.en}.`]), vi: far ? "Những cái kia là gì?" : "Những cái này là gì?", tip: "Hỏi <b lang=\"vi\">nhiều</b> vật → trả lời <b>They're</b> + tên vật có thêm <b>s</b>." };
 }
 const G = [
   { u: 0, f: c => { const x = c.pick(isColor), y = c.pick(isColor, [x]); return { pic: P.one(x), q: "What color is it?", ok: `It's ${x.en}.`, bad: one([`It's ${y.en}.`, `They're ${x.en}.`]), vi: "Nó màu gì?", tip: "Hỏi màu → trả lời <b>It's</b> + màu. Con nhìn kỹ màu trong tranh nhé." }; } },
@@ -1117,7 +1187,7 @@ const G = [
   { u: 5, f: c => { const x = c.pick(inL(CLOTHES)), y = c.pick(inL(CLOTHES), [x]); return { pic: P.one(x), q: "What are you wearing?", ok: `I'm wearing ${wear(x.en)}.`, bad: one([`I'm wearing ${wear(y.en)}.`, `I wearing ${wear(x.en)}.`]), vi: "Con đang mặc gì?", tip: "Trả lời <b>I'm wearing</b> + quần áo (nhớ có <b>I'm</b>). Con nhìn tranh xem là đồ gì." }; } },
   { u: 5, f: c => thisThat(c, "that", "those") },
   { u: 6, f: c => thisThat(c, "this", "these") },
-  { u: 6, f: c => { const x = c.pick(inL(TOYS)), y = c.pick(inL(TOYS), [x]); return { pic: P.one(x), q: "What do you want?", ok: `I want ${an(x.en)}.`, bad: one([`I wants ${an(x.en)}.`, `I want ${an(y.en)}.`]), vi: "Con muốn gì?", tip: "Trả lời <b>I want</b> + a/an + đồ chơi. Với <b>I</b> thì want không thêm s." }; } },
+  { u: 6, f: c => { const x = c.pick(inL(TOYS)), y = c.pick(inL(TOYS), [x]); return { pic: P.one(x), q: "What do you want?", ok: `I want ${an(x.en)}.`, bad: one([`I wants ${an(x.en)}.`, `I want ${an(y.en)}.`]), vi: "Con muốn gì?", tip: "Trả lời <b>I want</b> + a/an + đồ chơi. Với <b>I</b> thì <b>want</b> không thêm <b>s</b>." }; } },
   { u: 7, f: () => { const a = one(Object.keys(ACT7)), yes = Math.random() < .5; return { pic: P.badge(ACT7[a], yes ? "✅" : "❌"), q: `Can you ${a}?`, ok: yes ? "Yes, I can." : "No, I can't.", bad: yes ? one(["No, I can't.", "Yes, I do."]) : one(["Yes, I can.", "No, I don't."]), vi: `Con có ${ACT_VI[a]} được không?`, tip: "✅ là làm được → <b>Yes, I can.</b> ❌ là không làm được → <b>No, I can't.</b>" }; } },
   { u: 7, f: c => { const x = c.pick(inL(BODY)), y = c.pick(inL(BODY), [x]); return { pic: P.one(x), q: "What's this?", ok: `It's my ${x.en}.`, bad: `It's my ${y.en}.`, vi: "Đây là gì?", tip: "Trả lời <b>It's my</b> + bộ phận cơ thể. Con nhìn kỹ tranh nhé." }; } },
   { u: 8, f: c => {
@@ -1160,14 +1230,32 @@ function genPho(c) {
   const kwHtml = `<span class="kw">${esc(kw.slice(0, at))}<strong>${esc(kw[at])}</strong>${esc(kw.slice(at + 1))}</span>`;
   const it = { q: `<b>${l.L}</b> as in ${kwHtml}`, opts: list.map(x => pic(x.e)), ans: list.indexOf(ok), sig: l.L + ok.en }, pos = l.end ? "cuối" : "đầu";
   it.hints = [
-    { t: `Chữ <b>${l.L}</b> đọc là âm <b>${l.snd}</b>, giống âm ${pos} của từ <b>${kw}</b>.`, say: `${sayLetter(l)}. ${kw}` },
-    { t: `Tên các tranh: ${list.map((x, j) => `${K[j]}. <b>${esc(x.en)}</b>`).join(" · ")}. Con đọc to từng từ, nghe âm ${pos} nhé.`, say: list.map(x => x.en).join(". ") },
+    { t: `Chữ <b>${l.L}</b> đọc là âm <b>${l.snd}</b>, giống âm ${pos} của từ <b>${kw}</b>.` },
+    { t: `Tên các tranh: ${list.map((x, j) => `<b>${K[j]}. ${esc(x.en)}</b>`).join(" · ")}. Con đọc to từng từ, nghe âm ${pos} nhé.` },
     cutHint(it),
   ];
   return it;
 }
 /* Gợi ý 3 mức cho mỗi câu: 1 nhắc cách làm/nghĩa, 2 thu hẹp, 3 loại bớt đáp án sai (hoặc gần như chỉ ra đáp án).
-   Mỗi mức: { t: lời gợi ý (HTML), say?: câu đọc lên, cut?: các đáp án bị gạch } */
+   Mỗi mức: { t: lời gợi ý (HTML), say?: câu tiếng Anh đọc thêm sau lời gợi ý, cut?: các đáp án bị gạch }.
+   Lời gợi ý được đọc to: chữ thường đọc giọng Việt, chữ in đậm <b> (và chữ mờ để tô) đọc giọng Anh,
+   trừ <b lang="vi"> là chữ tiếng Việt in đậm. */
+const EMO_VI = { "✅": "dấu tích xanh", "❌": "dấu x đỏ", "👍": "ngón cái giơ lên", "👎": "ngón cái chỉ xuống", "→": ", ", "·": ", ", "+": ", ", "=": " là " };
+function hintSegs(h) {
+  const box = document.createElement("div"), segs = [];
+  box.innerHTML = h.t;
+  box.childNodes.forEach(n => {
+    const en = n.nodeType === 1 && (n.matches("b:not([lang=vi]), .trace"));
+    let t = n.textContent;
+    t = en ? t.replace(/(\w)\/(\w)/g, "$1 or $2")
+      : t.replace(/[✅❌👍👎→·+=]/g, c => EMO_VI[c]).replace(/(\w)\/(\w)/g, "$1 hoặc $2").replace(/\p{Extended_Pictographic}/gu, "");
+    if (!/[\p{L}\p{N}\/]/u.test(t)) { if (segs.length) segs[segs.length - 1].t += t; return; }
+    const last = segs[segs.length - 1];
+    if (last && last.en === en) last.t += t; else segs.push({ en, t });
+  });
+  if (h.say) segs.push({ en: true, t: h.say });
+  return segs.map(g => ({ en: g.en, t: g.t.replace(/\s+/g, " ").replace(/\s+([.,?!])/g, "$1").trim() })).filter(g => g.t);
+}
 const wrongOf = it => shuffle(it.opts.map((_, j) => j).filter(j => j !== it.ans));
 function cutHint(it) {
   const w = wrongOf(it)[0];
@@ -1179,7 +1267,7 @@ function genVocA(c, art) {
     const x = c.pick(isNoun), o = shuffle([an(x.en), wrongAn(x.en), plural(x.en)]);
     const it = { pic: P.one(x), opts: o, ans: o.indexOf(an(x.en)), sig: x.en };
     it.hints = [
-      { t: `Tranh có <b>1</b> ${esc(x.vi)} → không chọn từ có thêm <b>s</b> ở cuối (đó là nhiều cái).` },
+      { t: `Tranh có <b lang="vi">1</b> ${esc(x.vi)} → không chọn từ có thêm <b>s</b> ở cuối (đó là nhiều cái).` },
       { t: TIP_AN },
       { t: `Đáp án <b>${K[o.indexOf(plural(x.en))]}</b> sai rồi. Con chọn trong những đáp án còn lại nhé.`, cut: [o.indexOf(plural(x.en))] },
     ];
@@ -1188,7 +1276,7 @@ function genVocA(c, art) {
   const x = c.pick(isPic), list = shuffle([x, ...c.pickN(2, isPic, [x])]);
   const it = { pic: P.one(x), opts: list.map(label), ans: list.indexOf(x), sig: x.en };
   it.hints = [
-    { t: `Tranh là: <b>${esc(x.vi)}</b>.` },
+    { t: `Tranh là: <b lang="vi">${esc(x.vi)}</b>.` },
     { t: `Từ tiếng Anh bắt đầu bằng chữ <b>${x.en[0].toUpperCase()}</b>.` },
     cutHint(it),
   ];
@@ -1199,7 +1287,7 @@ function genVocB(c) {
   const it = { q: esc(x.en), opts: list.map(w => pic(w.e)), ans: list.indexOf(x), sig: x.en };
   it.hints = [
     { t: "Con nghe từ này nhé.", say: x.en },
-    { t: `Nghĩa tiếng Việt: <b>${esc(x.vi)}</b>.` },
+    { t: `Nghĩa tiếng Việt: <b lang="vi">${esc(x.vi)}</b>.` },
     cutHint(it),
   ];
   return it;
@@ -1215,7 +1303,7 @@ function genWrite(c) {
   const it = { pic: P.one(x), word: x.en, at: i, opts, ans: opts.indexOf(L), sig: x.en };
   const w = wrongOf(it)[0];
   it.hints = [
-    { t: `Tranh là <b>${esc(x.vi)}</b>. Con nghe thật kỹ từng âm trong từ nhé.`, say: x.en },
+    { t: `Tranh là <b lang="vi">${esc(x.vi)}</b>. Con nghe thật kỹ từng âm trong từ nhé.`, say: x.en },
     { t: `Chữ <b>${opts[w]}</b> không đúng.`, cut: [w] },
     { t: `Con nhìn chữ mờ rồi tô theo: <span class="trace">${esc(x.en)}</span>` },
   ];
@@ -1235,7 +1323,7 @@ const SECS = [["pho", "Phonetics"], ["voc", "Vocabulary"], ["gra", "Grammar"], [
 
 function makeExam(eow, sg) {
   const c = examCtx(eow, sg);
-  const qHint = r => ({ t: `Câu hỏi nghĩa là: <b>${esc(r.vi)}</b>`, say: r.q });
+  const qHint = r => ({ t: `Câu hỏi nghĩa là: <b lang="vi">${esc(r.vi)}</b>`, say: r.q });
   const gram = () => {
     const r = pickT(c, G).f(c); if (r.ok === r.bad) return null;
     const o = shuffle([r.ok, r.bad]), it = { pic: r.pic, q: r.q, opts: o, ans: o.indexOf(r.ok), sig: r.q + r.ok };
@@ -1261,7 +1349,7 @@ function makeExam(eow, sg) {
     const r = pickT(c, R).f(c, yes[i]);
     return { pic: r.pic, q: r.s, opts: ["Yes", "No"], ans: yes[i] ? 0 : 1, sig: r.s, hints: [
       { t: "Con nghe câu này, rồi nhìn kỹ tranh nhé.", say: r.s },
-      { t: `Câu nghĩa là: <b>${esc(r.vi)}</b>` },
+      { t: `Câu nghĩa là: <b lang="vi">${esc(r.vi)}</b>` },
       { t: `${esc(r.see)} Có giống câu không?` },
     ] };
   });
@@ -1325,6 +1413,7 @@ function examSetup() {
   document.getElementById("make").onclick = () => go(() => examPage(makeExam(EXAM.eow, EXAM.sg)));
 }
 
+let examRO = null;
 function examPage(T) {
   document.title = "Practice Test · Lớp 1";
   const items = T.parts.flatMap(p => p.items), real = items.filter(i => !i.ex);
@@ -1340,6 +1429,53 @@ function examPage(T) {
   const usedHints = real.reduce((a, i) => a + (i.hl || 0), 0);
   // Các đáp án đã bị gạch bởi gợi ý mức đã mở
   const cutOf = it => (it.hints || []).slice(0, it.hl || 0).flatMap(h => h.cut || []);
+  const hintsHtml = it => {
+    const hl = it.hl || 0;
+    return !it.ex && hl ? `<div class="hints noprint">${it.hints.slice(0, hl).map((h, k) => `<p><span><i>Gợi ý ${k + 1}</i>${h.t}</span><button class="say" data-hs="${it.id}:${k}" aria-label="Đọc gợi ý ${k + 1}">🔊</button></p>`).join("")}</div>` : "";
+  };
+  // Nút gợi ý (hoặc số gợi ý đã dùng khi đã nộp) + nhãn Ví dụ / dấu chấm đúng sai
+  const markHtml = it => {
+    const hl = it.hl || 0;
+    const hb = it.ex || !it.hints ? "" : T.done ? (hl ? `<span class="hu" title="Số gợi ý đã dùng">💡${hl}</span>` : "")
+      : `<button class="hintb noprint" data-h="${it.id}"${hl >= 3 ? " disabled" : ""} aria-label="Gợi ý (đã dùng ${hl}/3)">💡 Gợi ý <i>${hl}/3</i></button>`;
+    return hb + (it.ex ? `<span class="exb">Ví dụ</span>` : T.done ? (it.sel === it.ans ? `<span class="mk ok" aria-label="Đúng">✓</span>` : `<span class="mk no" aria-label="Sai">✗</span>`) : "");
+  };
+
+  /* Bài nối (Grammar 5): câu hỏi cột trái, câu trả lời cột phải, nối bằng đường kẻ.
+     Chạm một câu hỏi rồi chạm câu trả lời (hoặc ngược lại). MS = ô đang chọn dở. Đáp án bị gợi ý gạch chỉ hiện khi đang chọn câu đó. */
+  const MS = { q: null, a: null };
+  const matchHtml = (p, pi) => {
+    const act = MS.q != null ? byId[MS.q] : null, cut = act ? cutOf(act) : [];
+    const used = new Map(p.items.filter(i => i.sel != null).map(i => [i.sel, i]));
+    const left = p.items.map(it => `<div class="mq${it.ex ? " ex" : ""}${MS.q === it.id ? " on" : ""}${it.sel != null ? " linked" : ""}" data-mq="${it.id}"${it.ex || T.done ? "" : ` role="button" tabindex="0" aria-pressed="${MS.q === it.id}"`}>
+        <div class="qhead"><span class="qn">${it.ex ? 0 : it.n}.</span>${it.pic ? `<span class="qp">${it.pic}</span>` : ""}${markHtml(it)}</div>
+        <div class="qt">${esc(it.q)}</div>${hintsHtml(it)}<span class="dot"></span></div>`).join("");
+    const right = p.answers.map((a, j) => {
+      const u = used.get(j), x = !T.done && cut.includes(j);
+      return `<button class="ma${MS.a === j ? " on" : ""}${u ? " linked" : ""}${x ? " cut" : ""}" data-ma="${j}" aria-pressed="${MS.a === j}"${T.done || (u && u.ex) || x ? " disabled" : ""}><span class="dot"></span><span class="k">${K[j]}</span><span>${esc(a)}</span></button>`;
+    }).join("");
+    return `<div class="mgrid" data-mg="${pi}"><div class="mcol">${left}</div><div class="mcol">${right}</div><svg class="mlines" aria-hidden="true"></svg></div>`;
+  };
+  const drawLines = g => {
+    const p = T.parts[g.dataset.mg], r = g.getBoundingClientRect(), svg = g.querySelector(".mlines");
+    const pt = el => { const d = el.querySelector(".dot").getBoundingClientRect(); return [d.left + d.width / 2 - r.left, d.top + d.height / 2 - r.top]; };
+    const ln = (it, j, cls) => {
+      const [x1, y1] = pt(g.querySelector(`[data-mq="${it.id}"]`)), [x2, y2] = pt(g.querySelector(`[data-ma="${j}"]`)), m = (x2 - x1) / 2;
+      return `<path class="${cls}" d="M${x1} ${y1}C${x1 + m} ${y1} ${x2 - m} ${y2} ${x2} ${y2}"/>`;
+    };
+    svg.setAttribute("viewBox", `0 0 ${r.width} ${r.height}`);
+    svg.innerHTML = p.items.map(it => it.ex ? ln(it, it.ans, "ex")
+      : !T.done ? (it.sel != null ? ln(it, it.sel, "") : "")
+      : it.sel === it.ans ? ln(it, it.ans, "ok") : (it.sel != null ? ln(it, it.sel, "no") : "") + ln(it, it.ans, "fix")).join("");
+  };
+  const paintMatch = pi => {
+    const g = $app.querySelector(`.mgrid[data-mg="${pi}"]`), f = document.activeElement;
+    const fk = f && g.contains(f) ? (f.dataset.mq != null ? `[data-mq="${f.dataset.mq}"]` : f.dataset.ma != null ? `[data-ma="${f.dataset.ma}"]` : null) : null;
+    g.outerHTML = matchHtml(T.parts[pi], pi);
+    const ng = $app.querySelector(`.mgrid[data-mg="${pi}"]`);
+    drawLines(ng);
+    if (fk) { const el = ng.querySelector(fk); if (el && !el.disabled) el.focus(); }
+  };
 
   const qHtml = (p, it) => {
     const lock = it.ex || T.done;
@@ -1348,11 +1484,7 @@ function examPage(T) {
     const btn = (j, inner, cls = "") => { const x = !T.done && cut.includes(j); return `<button class="ch${cls}${st(j)}${x ? " cut" : ""}" data-q="${it.id}" data-j="${j}" aria-pressed="${it.sel === j}"${lock || x ? " disabled" : ""}><span class="k">${K[j]}</span>${inner}</button>`; };
     const num = `<span class="qn">${it.ex ? 0 : it.n}.</span>`;
     const qp = it.pic ? `<span class="qp">${it.pic}</span>` : "";
-    const hl = it.hl || 0;
-    const hb = it.ex || !it.hints ? "" : T.done ? (hl ? `<span class="hu" title="Số gợi ý đã dùng">💡${hl}</span>` : "")
-      : `<button class="hintb noprint" data-h="${it.id}"${hl >= 3 ? " disabled" : ""} aria-label="Gợi ý (đã dùng ${hl}/3)">💡 Gợi ý <i>${hl}/3</i></button>`;
-    const hints = !it.ex && hl ? `<div class="hints noprint">${it.hints.slice(0, hl).map((h, k) => `<p><span><i>Gợi ý ${k + 1}</i>${h.t}</span>${h.say ? `<button class="say" data-say="${esc(h.say)}" aria-label="Nghe">🔊</button>` : ""}</p>`).join("")}</div>` : "";
-    const mark = hb + (it.ex ? `<span class="exb">Ví dụ</span>` : T.done ? (it.sel === it.ans ? `<span class="mk ok" aria-label="Đúng">✓</span>` : `<span class="mk no" aria-label="Sai">✗</span>`) : "");
+    const hints = hintsHtml(it), mark = markHtml(it);
     let head, chs;
     if (p.lay === "pics") { head = `${num}<span class="qt">${it.q}</span>`; chs = `<div class="chs c3">${it.opts.map((o, j) => btn(j, o, " pico")).join("")}</div>`; }
     else if (p.lay === "words") { head = num + qp; chs = `<div class="chs c3">${it.opts.map((o, j) => btn(j, `<span>${esc(o)}</span>`)).join("")}</div>`; }
@@ -1362,16 +1494,14 @@ function examPage(T) {
       chs = `<div class="chs c3">${it.opts.map((o, j) => btn(j, `<span>${o}</span>`, " big")).join("")}</div>`;
     } else {
       head = `${num}${qp}<span class="qt">${esc(it.q)}</span>`;
-      chs = p.lay === "match" ? `<div class="chs cl">${it.opts.map((o, j) => btn(j, "", " only")).join("")}</div>`
-        : `<div class="chs${p.lay === "yn" ? " c2" : ""}">${it.opts.map((o, j) => btn(j, `<span>${esc(o)}</span>`)).join("")}</div>`;
+      chs = `<div class="chs${p.lay === "yn" ? " c2" : ""}">${it.opts.map((o, j) => btn(j, `<span>${esc(o)}</span>`)).join("")}</div>`;
     }
     return `<div class="q ${p.lay}${it.ex ? " ex" : ""}" data-id="${it.id}"><div class="qhead">${head}${mark}</div>${chs}${hints}</div>`;
   };
-  const partHtml = p => `<section class="paper">
+  const partHtml = (p, pi) => `<section class="paper">
     ${p.head ? `<div class="sec-h"><h3>${p.head}</h3></div>` : ""}
     <p class="instr">${p.no}. ${p.en} There is one example. <span class="pts">(${T.done ? score(p.items) : "……"}/${maxOf(p.items)} pts)</span>${S.vi ? `<small>${p.vi}</small>` : ""}</p>
-    ${p.answers ? `<div class="ansbox">${p.answers.map((a, j) => `<div><b>${K[j]}.</b>${esc(a)}</div>`).join("")}</div>` : ""}
-    ${p.items.map(it => qHtml(p, it)).join("")}
+    ${p.lay === "match" ? matchHtml(p, pi) : p.items.map(it => qHtml(p, it)).join("")}
   </section>`;
 
   $app.innerHTML = `
@@ -1386,12 +1516,24 @@ function examPage(T) {
           <p>${wrong ? `Con sai ${wrong} câu. Ô đỏ là con chọn sai, ô xanh là đáp án đúng.` : "Con làm đúng hết! Giỏi quá!"}</p>
           <p>${usedHints ? `Con đã dùng ${usedHints} gợi ý (💡 cạnh câu hỏi). Lần sau thử làm ít gợi ý hơn nhé!` : "Con không cần gợi ý nào. Tuyệt vời!"}</p></div>` : ""}
       </section>
-      ${T.parts.map(partHtml).join("")}
+      ${T.parts.map((p, pi) => partHtml(p, pi)).join("")}
       <div class="xfoot noprint">${T.done
         ? `<button class="btn sun" id="new2">🔄 Làm đề khác</button><button class="btn primary" id="home2">Trang chủ</button>`
         : `<span class="xmeta" id="cnt"></span><button class="btn primary" id="submit" style="font-size:20px;padding:12px 26px">✅ Nộp bài</button>`}</div>
     </div>`;
 
+  // Vẽ lại đường nối khi khung đổi cỡ (xoay máy, mở gợi ý, phông chữ tải xong)
+  const redraw = () => $app.querySelectorAll(".mgrid").forEach(drawLines);
+  if (examRO) examRO.disconnect();
+  examRO = new ResizeObserver(redraw);
+  examRO.observe(document.getElementById("exam"));
+  redraw();
+  if (document.fonts) document.fonts.ready.then(redraw);
+  const sayHint = (it, k) => speakSeq(hintSegs(it.hints[k]));
+  if (T.done) $app.querySelector("#exam").addEventListener("click", e => {
+    const sb = e.target.closest(".say[data-hs]");
+    if (sb) { const [i, k] = sb.dataset.hs.split(":"); sayHint(byId[i], +k); }
+  });
   const fresh = () => go(() => examPage(makeExam(T.eow, T.sg)));
   document.getElementById("back").onclick = () => go(examSetup);
   document.getElementById("print").onclick = () => window.print();
@@ -1411,19 +1553,41 @@ function examPage(T) {
   const cnt = document.getElementById("cnt");
   const count = () => cnt.textContent = `Đã làm ${real.filter(i => i.sel != null).length}/${real.length} câu`;
   count();
+  const link = (p, it, j) => {
+    p.items.forEach(o => { if (!o.ex && o.sel === j) o.sel = null; });
+    it.sel = j; MS.q = MS.a = null;
+  };
   document.getElementById("exam").onclick = e => {
-    const sb = e.target.closest(".say[data-say]");
-    if (sb) { speak(sb.dataset.say); return; }
+    const sb = e.target.closest(".say[data-hs]");
+    if (sb) { const [i, k] = sb.dataset.hs.split(":"); sayHint(byId[i], +k); return; }
     const hb = e.target.closest(".hintb[data-h]");
     if (hb) {
-      const it = byId[hb.dataset.h];
-      if ((it.hl || 0) >= 3) return;
-      it.hl = (it.hl || 0) + 1;
-      const h = it.hints[it.hl - 1];
+      const it = byId[hb.dataset.h], hl = it.hl || 0;
+      if (hl >= 3) return;
+      if (!confirm(`Con muốn mở gợi ý ${hl + 1}/3 cho câu ${it.n} không?`)) return;
+      it.hl = hl + 1;
+      const h = it.hints[hl], p = partOf[it.id];
       if (h.cut && h.cut.includes(it.sel)) it.sel = null;
-      const el = hb.closest(".q");
-      el.outerHTML = qHtml(partOf[it.id], it);
-      if (h.say) speak(h.say);
+      if (p.lay === "match") { MS.q = it.id; MS.a = null; paintMatch(T.parts.indexOf(p)); }
+      else hb.closest(".q").outerHTML = qHtml(p, it);
+      sayHint(it, hl);
+      count();
+      return;
+    }
+    const mq = e.target.closest(".mq[data-mq]"), ma = e.target.closest(".ma[data-ma]");
+    if (mq || ma) {
+      const it = mq && byId[mq.dataset.mq], j = ma ? +ma.dataset.ma : null;
+      if ((it && it.ex) || (ma && ma.disabled)) return;
+      const pi = +(mq || ma).closest(".mgrid").dataset.mg, p = T.parts[pi];
+      if (it) {
+        if (MS.a != null) link(p, it, MS.a);
+        else MS.q = MS.q === it.id ? null : it.id;
+      } else {
+        const q = MS.q != null && byId[MS.q];
+        if (q) { if (q.sel === j) { q.sel = null; MS.q = null; } else link(p, q, j); }
+        else MS.a = MS.a === j ? null : j;
+      }
+      paintMatch(pi);
       count();
       return;
     }
@@ -1435,6 +1599,9 @@ function examPage(T) {
     const blank = b.closest(".q").querySelector(".blank");
     if (blank) blank.textContent = it.opts[it.sel];
     count();
+  };
+  document.getElementById("exam").onkeydown = e => {
+    if ((e.key === "Enter" || e.key === " ") && e.target.matches(".mq[role=button]")) { e.preventDefault(); e.target.click(); }
   };
   document.getElementById("submit").onclick = () => {
     const left = real.filter(i => i.sel == null).length;
