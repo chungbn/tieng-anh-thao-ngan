@@ -270,6 +270,13 @@ button:focus-visible { outline: 3px solid var(--sky); outline-offset: 3px; }
 .opts.o3 .opt .pic { font-size: clamp(48px, 14vw, 72px); }
 .opts.o1 { grid-template-columns: 1fr; max-width: 420px; margin: 0 auto; }
 .opt.rw { min-height: 70px; font-size: clamp(28px, 8vw, 38px); letter-spacing: 1px; }
+.rchip { padding: 6px 14px; font-family: var(--display); font-size: 18px; }
+.aopts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.aopt { display: grid; gap: 8px; }
+.aopt .play { border: 3px solid var(--line); background: var(--card); border-radius: 22px; min-height: 96px; font-size: 44px; display: grid; place-items: center; align-content: center; box-shadow: var(--shadow); }
+.aopt .play small { font-family: var(--display); font-weight: 800; font-size: 18px; color: var(--muted); }
+.aopt .play.on { border-color: var(--sun); background: var(--bg); }
+.opt.pickb { min-height: 52px; padding: 6px; font-family: var(--display); font-weight: 800; font-size: 18px; }
 .opt .wlab { font-family: var(--display); font-weight: 800; font-size: 20px; color: var(--leaf); overflow-wrap: anywhere; }
 .picks { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 150px), 1fr)); gap: 8px; margin-bottom: 18px; }
 .pick { text-align: left; border: 2px solid var(--line); background: var(--card); border-radius: 14px; padding: 8px 12px; box-shadow: var(--shadow); min-width: 0; }
@@ -1131,11 +1138,13 @@ function caseMem(u) {
 
 /* ---------- Luyện đọc từ mỗi ngày (nhận mặt cả từ, không chỉ chữ cái đầu) ----------
    Mỗi từ có một "hộp" 0–6 (lặp lại ngắt quãng): đúng ngay lần đầu, không nghe gợi ý → lên hộp, lâu hơn mới gặp lại;
-   sai → về hộp 0, gặp lại ngay trong buổi và ngày mai. Dạng câu hỏi khó dần theo hộp:
-     từ mới  → làm quen: tranh + chữ + nghe đọc
-     hộp 0–1 → Đọc từ, chọn hình (không phát âm trước)
-     hộp 2–3 → Nhìn hình, chọn từ đúng trong các từ na ná nhau
-     hộp ≥ 4 → Nhìn nhanh: từ hiện 1,5 giây rồi ẩn, chọn hình
+   sai → về hộp 0, gặp lại ngay trong buổi và ngày mai.
+   Mặt chữ chỉ đi kèm MỘT yếu tố mỗi câu — tranh (nhánh P) hoặc tiếng đọc (nhánh A), không bao giờ cả hai.
+   Dạng câu hỏi khó dần theo hộp:          nhánh tranh (P)                    nhánh tiếng (A)
+     từ mới  → làm quen:                   chữ + tranh                        chữ + tiếng đọc
+     hộp 0–1 →                             đọc từ, chọn hình                   nghe, chọn từ
+     hộp 2–3 →                             nhìn hình, chọn từ                  đọc từ, chọn tiếng đọc đúng
+     hộp ≥ 4 → nhìn nhanh 1,5 giây rồi:   chọn hình                          chọn tiếng đọc đúng
    Phương án nhiễu luôn là từ có mặt chữ giống từ đúng (cùng chữ đầu, chữ cuối, độ dài) để bé phải nhìn cả từ. */
 const RD_GAP = [0, 1, 2, 4, 7, 14, 30];   // số ngày tới lần ôn sau, theo hộp
 const RD_KNOWN = 4;                       // từ hộp này trở lên coi như đã thuộc
@@ -1189,16 +1198,16 @@ function readHome() {
     <div class="rbar" aria-label="Đã thuộc ${known}/${pool.length} từ"><i style="width:${pool.length ? known / pool.length * 100 : 0}%"></i></div>
     <div class="row"><button class="btn primary" id="go" style="font-size:22px;padding:14px 28px">${doneToday ? "▶ Luyện thêm một lượt" : "▶ Bắt đầu luyện hôm nay"}</button></div>
     ${weak.length ? `<div class="section-label" style="margin-top:22px">Từ con hay nhầm — chạm để nghe</div>
-      <div class="chips">${weak.map(x => `<button class="chip" data-say="${esc(x.en)}">${pic(x.e)}${esc(x.en)}</button>`).join("")}</div>` : ""}
+      <div class="chips">${weak.map(x => `<button class="chip rchip" data-say="${esc(x.en)}">🔊 ${esc(x.en)}</button>`).join("")}</div>` : ""}
     <div class="paper" style="margin-top:22px">
       <b>Con luyện thế nào?</b>
       <div class="plan">
-        <div><b>🌱 Làm quen từ mới</b>Xem tranh, nhìn chữ, nghe đọc và chỉ tay đọc theo</div>
-        <div><b>📖 Đọc từ, chọn hình</b>Con tự đọc chữ (máy không đọc trước) rồi chọn tranh</div>
-        <div><b>🖼️ Nhìn hình, chọn từ</b>Các từ trông na ná nhau, con phải nhìn kỹ cả từ</div>
+        <div><b>🖼️ Chữ với tranh</b>Làm quen từ mới bằng tranh → đọc từ chọn hình → nhìn hình chọn từ. Không có tiếng đọc.</div>
+        <div><b>🔊 Chữ với tiếng đọc</b>Làm quen từ mới bằng tiếng đọc → nghe chọn từ → đọc từ chọn tiếng đọc đúng. Không có tranh.</div>
+        <div><b>🎯 Từ na ná nhau</b>Các phương án trông giống nhau (book, black, baby) nên con phải nhìn kỹ cả từ</div>
         <div><b>⚡ Nhìn nhanh</b>Từ đã thuộc chỉ hiện 1,5 giây để con đọc nhanh hơn</div>
       </div>
-      <p class="xmeta">Bấm 🔊 Nghe thì vẫn được làm tiếp, nhưng từ đó chưa được tính là thuộc. Phạm vi từ:</p>
+      <p class="xmeta">Mỗi câu chữ chỉ đi với tranh hoặc với tiếng đọc, không có cả hai, để con nhớ mặt chữ chứ không đoán theo tranh. Bấm 👀 Xem lại ở bài nhìn nhanh thì từ đó chưa được tính là thuộc. Phạm vi từ:</p>
       ${scopeHtml()}
     </div>`;
   document.getElementById("back").onclick = () => go(home);
@@ -1214,96 +1223,110 @@ function readSession() {
   let list = [...due, ...fresh];
   // Thiếu từ thì lấy thêm từ đang học chưa tới hạn, hộp thấp trước
   if (list.length < RD_N) list.push(...shuffle(pool.filter(x => st[x.en] && !list.includes(x))).sort((a, b) => st[a.en].b - st[b.en].b).slice(0, RD_N - list.length));
-  const kind = x => !st[x.en] ? "read" : st[x.en].b >= RD_KNOWN ? "flash" : st[x.en].b >= 2 ? "pick" : "read";
-  const steps = shuffle(list).map(x => ({ x, k: kind(x) }));
-  // Từ mới: thẻ làm quen trước, câu hỏi đọc nằm cách đó vài bước
+  // Mỗi từ trong lượt chỉ đi với MỘT yếu tố: tranh (P) hoặc tiếng đọc (A), chia đều hai nhánh
+  const mods = shuffle(list.map((_, i) => i % 2 ? "A" : "P"));
+  const lvl = x => !st[x.en] || st[x.en].b < 2 ? 0 : st[x.en].b < RD_KNOWN ? 1 : 2;
+  const steps = shuffle(list.map((x, i) => ({ x, m: mods[i], k: RD_K[mods[i]][lvl(x)] })));
+  // Từ mới: thẻ làm quen (cùng nhánh) trước, câu hỏi nằm cách đó vài bước
   for (const x of fresh) {
     const i = steps.findIndex(s => s.x === x);
-    steps.splice(Math.max(0, i - 2), 0, { x, k: "intro" });
+    steps.splice(Math.max(0, i - 2), 0, { x, m: steps[i].m, k: "intro" + steps[i].m });
   }
   return { pool, steps, i: 0, firstOk: 0, asked: 0, again: new Set(), told: new Set() };
 }
 
+// Dạng bài theo nhánh và mức (hộp 0–1, 2–3, ≥4)
+const RD_K = { P: ["read", "pick", "flashP"], A: ["hear", "match", "flashA"] };
 const RD_SAY = {
-  intro: "Từ mới. Con nhìn chữ, nghe đọc, rồi chỉ tay đọc theo nhé.",
+  introP: "Từ mới. Con nhìn tranh và nhìn kỹ từng chữ nhé.",
+  introA: "Từ mới. Con nghe đọc và chỉ tay theo từng chữ nhé.",
   read: "Con tự đọc từ này, rồi chọn hình đúng.",
   pick: "Hình này là từ nào? Con nhìn kỹ cả từ nhé.",
-  flash: "Từ sẽ hiện thật nhanh. Con đọc rồi chọn hình.",
+  flashP: "Từ sẽ hiện thật nhanh. Con đọc rồi chọn hình.",
+  hear: "Con nghe, rồi chọn từ đúng.",
+  match: "Con đọc từ này. Bấm từng loa để nghe, rồi chọn tiếng đọc đúng.",
+  flashA: "Từ sẽ hiện thật nhanh. Con đọc rồi chọn tiếng đọc đúng.",
 };
 function readRun(R) {
   const back = () => go(readHome);
   if (R.i >= R.steps.length) return readDone(R);
-  const { x, k, retry } = R.steps[R.i], total = R.steps.length;
+  const { x, m, k, retry } = R.steps[R.i];
   const top = `<div class="game-top"><button class="btn back" id="back" aria-label="Quay lại">←</button><div class="dots">${R.steps.map((_, j) => `<i class="${j < R.i ? "done" : j === R.i ? "now" : ""}"></i>`).join("")}</div></div>`;
   const next = () => { R.i++; go(() => readRun(R)); };
-  // Lần đầu gặp mỗi dạng trong lượt: đọc hướng dẫn bằng tiếng Việt
-  const intro = () => { if (!R.told.has(k)) { R.told.add(k); speakSeq([{ en: false, t: RD_SAY[k] }]); return true; } return false; };
+  // Lần đầu gặp mỗi dạng trong lượt: đọc hướng dẫn bằng tiếng Việt (onend: đọc xong thì làm tiếp)
+  const told = R.told.has(k);
+  const intro = then => { if (!told) { R.told.add(k); speakSeq([{ en: false, t: RD_SAY[k] }]); if (then) setTimeout(then, 3800); } else if (then) then(); };
   const word = `<span class="rword">${esc(x.en)}</span>`;
+  const letters = `<div class="rletters">${[...x.en].map(c => c === " " ? `<i class="sp"></i>` : `<span>${esc(c)}</span>`).join("")}</div>`;
+  // Chữ sáng lần lượt từ trái sang phải khi máy đọc, để bé chỉ tay theo
+  const lit = () => {
+    $app.querySelectorAll(".rletters span").forEach((s, j) => { s.classList.remove("lit"); setTimeout(() => s.classList.add("lit"), 120 * j); });
+    speak(x.en);
+  };
+  const alive = id => () => document.getElementById(id);
 
-  if (k === "intro") {
-    $app.innerHTML = `${top}<div class="prompt"><h3>🌱 Từ mới</h3><div class="big">${pic(x.e)}</div>
-      <div class="rletters">${[...x.en].map(c => c === " " ? `<i class="sp"></i>` : `<span>${esc(c)}</span>`).join("")}</div>
-      ${S.vi ? `<p class="rvi">${esc(x.vi)}</p>` : ""}
-      <div class="row"><button class="btn" id="say">🔊 Nghe lại</button><button class="btn primary" id="ok">Con đọc được rồi →</button></div></div>`;
+  if (k === "introP" || k === "introA") {
+    $app.innerHTML = `${top}<div class="prompt"><h3>🌱 Từ mới</h3>${k === "introP" ? `<div class="big">${pic(x.e)}</div>` : ""}${letters}
+      <div class="row">${k === "introA" ? `<button class="btn" id="say">🔊 Nghe lại</button>` : ""}<button class="btn primary" id="ok">Con nhớ rồi →</button></div></div>`;
     document.getElementById("back").onclick = back;
-    const lit = () => {
-      // Chữ sáng lần lượt từ trái sang phải khi máy đọc, để bé chỉ tay theo
-      const ls = [...$app.querySelectorAll(".rletters span")];
-      ls.forEach((s, j) => { s.classList.remove("lit"); setTimeout(() => s.classList.add("lit"), 120 * j); });
-      speak(x.en);
-    };
-    document.getElementById("say").onclick = lit;
     document.getElementById("ok").onclick = next;
-    if (intro()) setTimeout(() => { if (document.getElementById("say")) lit(); }, 4200); else lit();
+    if (k === "introA") { document.getElementById("say").onclick = lit; intro(() => alive("say")() && lit()); }
+    else intro();
     return;
   }
 
   const others = lookalikes(x, R.pool.length > 8 ? R.pool : examCtx(EXAM.eow, EXAM.sg).all.filter(isPic), 2);
   const list = shuffle([x, ...others]);
-  let heard = false, wrong = 0, locked = false;
-  const listen = `<button class="btn" id="say">🔊 Nghe</button>`;
-  let prompt, opts;
+  let wrong = 0, helped = false, locked = false, prompt, opts;
+  const flash = k === "flashP" || k === "flashA";
+  const wordBox = `<div class="rbox" id="wbox">${word}</div>${flash ? `<div class="row" style="margin-top:6px"><button class="btn" id="peek" hidden>👀 Xem lại</button></div>` : ""}`;
   if (k === "pick") {
-    prompt = `<h3>Hình này là từ nào?</h3><div class="big">${pic(x.e)}</div><div class="row" style="margin-top:6px">${listen}</div>`;
+    prompt = `<h3>Hình này là từ nào?</h3><div class="big">${pic(x.e)}</div>`;
     opts = `<div class="opts o1">${list.map((w, j) => `<button class="opt word rw" data-j="${j}">${esc(w.en)}</button>`).join("")}</div>`;
+  } else if (k === "hear") {
+    prompt = `<h3>Nghe và chọn từ đúng</h3><button class="speaker" id="say" aria-label="Nghe lại">🔊</button>`;
+    opts = `<div class="opts o1">${list.map((w, j) => `<button class="opt word rw" data-j="${j}">${esc(w.en)}</button>`).join("")}</div>`;
+  } else if (k === "match" || k === "flashA") {
+    prompt = `<h3>${flash ? "⚡ Nhìn nhanh, rồi chọn tiếng đọc đúng" : "Đọc từ, rồi chọn tiếng đọc đúng"}</h3>${wordBox}`;
+    opts = `<div class="aopts">${list.map((w, j) => `<div class="aopt"><button class="play" data-p="${j}" aria-label="Nghe tiếng đọc ${j + 1}">🔊<small>${j + 1}</small></button><button class="opt pickb" data-j="${j}">Chọn ${j + 1}</button></div>`).join("")}</div>`;
   } else {
-    prompt = `<h3>${k === "flash" ? "⚡ Nhìn nhanh rồi chọn hình" : "Con đọc từ này, rồi chọn hình đúng"}</h3><div class="rbox" id="wbox">${word}</div>
-      <div class="row" style="margin-top:6px">${k === "flash" ? `<button class="btn" id="peek" hidden>👀 Xem lại</button>` : ""}${listen}</div>`;
+    prompt = `<h3>${flash ? "⚡ Nhìn nhanh rồi chọn hình" : "Con đọc từ này, rồi chọn hình đúng"}</h3>${wordBox}`;
     opts = `<div class="opts o3">${list.map((w, j) => `<button class="opt" data-j="${j}" aria-label="Hình ${j + 1}">${pic(w.e)}</button>`).join("")}</div>`;
   }
   $app.innerHTML = `${top}<div class="prompt">${prompt}</div>${opts}`;
   document.getElementById("back").onclick = back;
-  const said = intro();
-  document.getElementById("say").onclick = () => { heard = true; speak(x.en); };
-  if (k === "flash") {
+  if (k === "hear") { document.getElementById("say").onclick = () => speak(x.en); intro(() => alive("say")() && !locked && speak(x.en)); }
+  else intro();
+  $app.querySelectorAll(".play[data-p]").forEach(b => b.onclick = () => {
+    $app.querySelectorAll(".play").forEach(p => p.classList.toggle("on", p === b));
+    speak(list[+b.dataset.p].en);
+  });
+  if (flash) {
     const box = document.getElementById("wbox"), peek = document.getElementById("peek");
     let tm;
-    const show = () => { box.classList.remove("gone"); clearTimeout(tm); tm = setTimeout(() => { if (locked) return; box.classList.add("gone"); peek.hidden = false; }, (S.slow ? 2000 : 1500) + (said ? 2500 : 0)); };
-    peek.onclick = () => { heard = true; peek.hidden = true; show(); };
+    const show = () => { box.classList.remove("gone"); clearTimeout(tm); tm = setTimeout(() => { if (locked) return; box.classList.add("gone"); peek.hidden = false; }, (S.slow ? 2000 : 1500) + (told ? 0 : 2500)); };
+    peek.onclick = () => { helped = true; peek.hidden = true; show(); };
     show();
   }
-  $app.querySelectorAll(".opt").forEach(b => b.onclick = () => {
+  $app.querySelectorAll(".opt[data-j]").forEach(b => b.onclick = () => {
     if (locked) return;
     const w = list[+b.dataset.j];
-    if (w !== x) {
-      wrong++; beep(false); b.classList.remove("bad"); void b.offsetWidth; b.classList.add("bad"); b.disabled = true;
-      if (k === "pick") speak(w.en);   // nghe từ con vừa chọn để thấy nó khác từ cần tìm
-      return;
-    }
+    if (w !== x) { wrong++; beep(false); b.classList.remove("bad"); void b.offsetWidth; b.classList.add("bad"); b.disabled = true; return; }
     locked = true; beep(true); b.classList.add("ok");
     $app.querySelectorAll(".opt").forEach(o => o.disabled = true);
     const wb = document.getElementById("wbox"); if (wb) wb.classList.remove("gone");
-    if (k !== "pick") b.insertAdjacentHTML("beforeend", `<span class="wlab">${esc(x.en)}</span>`);
-    speak(x.en);
+    // Phản hồi giữ đúng nhánh: nhánh tranh hiện chữ dưới tranh (không đọc), nhánh tiếng đọc lại từ (không tranh)
+    if (m === "P" && k !== "pick") b.insertAdjacentHTML("beforeend", `<span class="wlab">${esc(x.en)}</span>`);
+    if (m === "A") speak(x.en);
     // Cập nhật hộp của từ (lượt làm lại trong buổi không tính lên hộp)
     if (!retry) {
       R.asked++;
       const st = rdState(), s = st[x.en] || { b: 0, bad: 0 };
-      if (!wrong && !heard) { R.firstOk++; s.b = Math.min(s.b + 1, RD_GAP.length - 1); }
+      if (!wrong && !helped) { R.firstOk++; s.b = Math.min(s.b + 1, RD_GAP.length - 1); }
       else if (wrong) { s.b = 0; s.bad = (s.bad || 0) + 1; }
-      s.due = today() + (wrong ? 1 : heard ? 1 : RD_GAP[s.b]);
+      s.due = today() + (wrong || helped ? 1 : RD_GAP[s.b]);
       st[x.en] = s; store.set("r:words", st);
-      if (wrong) { R.again.add(x.en); R.steps.push({ x, k: "read", retry: true }); }
+      if (wrong) { R.again.add(x.en); R.steps.push({ x, m, k: RD_K[m][0], retry: true }); }
     }
     setTimeout(() => { if (document.body.contains(b)) next(); }, wrong ? 2000 : 1400);
   });
@@ -1320,7 +1343,7 @@ function readDone(R) {
       <div class="bigstars">${[1, 2, 3].map(i => `<span style="${i <= stars ? "" : "opacity:.2;filter:grayscale(1)"}">⭐</span>`).join("")}</div>
       <h2>${en}</h2>
       <p>Con đọc đúng ngay ${R.firstOk}/${R.asked} từ. 🔥 Đã luyện ${rdStreak()} ngày liên tiếp!</p>
-      ${again.length ? `<div class="section-label" style="margin-top:16px">Ngày mai ôn lại — chạm để nghe</div><div class="chips" style="justify-content:center">${again.map(x => `<button class="chip" data-say="${esc(x.en)}">${pic(x.e)}${esc(x.en)}</button>`).join("")}</div>` : ""}
+      ${again.length ? `<div class="section-label" style="margin-top:16px">Ngày mai ôn lại — chạm để nghe</div><div class="chips" style="justify-content:center">${again.map(x => `<button class="chip rchip" data-say="${esc(x.en)}">🔊 ${esc(x.en)}</button>`).join("")}</div>` : ""}
       <div class="row"><button class="btn sun" id="more">Luyện thêm</button><button class="btn primary" id="fin">Xong</button></div>
     </div>`;
   document.getElementById("back").onclick = () => go(readHome);
