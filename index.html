@@ -392,6 +392,9 @@ button:focus-visible { outline: 3px solid var(--sky); outline-offset: 3px; }
 .bq .mk { font-size: 22px; }
 .bhint { margin-top: 12px; }
 
+.scene-pic { margin: 14px auto 4px; max-width: 560px; }
+.scene-svg { display: block; width: 100%; height: auto; }
+.scene-svg * { vector-effect: non-scaling-stroke; }
 .blank.gap { min-width: 3.2em; padding: 0 4px; }
 .q.gap .ch { font-size: 18px; overflow-wrap: normal; word-break: normal; }
 @media (max-width: 480px) {
@@ -1622,6 +1625,225 @@ function many(n, gen) {
   }
   return out;
 }
+/* ---------- Tranh lớn cho bài Reading (vẽ nét đen bằng SVG, không dùng emoji) ----------
+   Mỗi chủ đề có nền vẽ sẵn và các "chỗ" đặt đồ vật. Mỗi đề chọn ngẫu nhiên vật nào, bao nhiêu, ở đâu → vẽ tranh,
+   đồng thời ghi lại sự thật (facts) để sinh câu Yes/No luôn khớp với tranh. Câu chỉ dùng từ trong phạm vi bé đã học;
+   câu đếm "There is/are" chỉ ra khi đã học tới Unit 4. Mỗi hình đặt tâm ở (0,0), cỡ khoảng -50..50. */
+const LN = 'fill="#fff" stroke="#222" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"';
+const OPEN = 'fill="none" stroke="#222" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"';
+const DOT = 'fill="#222"';
+// Viền gợn sóng (tán cây, mây, bụi cây): các cung lồi nối các điểm trên một elip
+function bumpy(rx, ry, n, a0 = 0, a1 = Math.PI * 2, cy = 0) {
+  const pts = [];
+  for (let i = 0; i <= n; i++) { const a = a0 + (a1 - a0) * i / n; pts.push([rx * Math.cos(a), cy + ry * Math.sin(a)]); }
+  let d = `M${pts[0][0].toFixed(1)},${pts[0][1].toFixed(1)}`;
+  for (let i = 1; i < pts.length; i++) {
+    const [x0, y0] = pts[i - 1], [x1, y1] = pts[i], r = Math.hypot(x1 - x0, y1 - y0) * .62;
+    d += ` A${r.toFixed(1)},${r.toFixed(1)} 0 0 1 ${x1.toFixed(1)},${y1.toFixed(1)}`;
+  }
+  return d;
+}
+const SPR = {
+  sun: () => `${Array.from({ length: 8 }, (_, i) => { const a = i * Math.PI / 4, c = Math.cos(a), s = Math.sin(a); return `<path ${OPEN} d="M${(25 * c).toFixed(1)},${(25 * s).toFixed(1)} L${(35 * c).toFixed(1)},${(35 * s).toFixed(1)}"/>`; }).join("")}<circle ${LN} r="18"/>`,
+  moon: () => `<path ${LN} d="M6,-21 A21,21 0 1 0 19,9 A16,16 0 0 1 6,-21 Z"/>`,
+  star: () => `<path ${LN} d="M0,-12 L3.5,-4 L12,-3.5 L5.5,2 L7.5,10.5 L0,6 L-7.5,10.5 L-5.5,2 L-12,-3.5 L-3.5,-4 Z"/>`,
+  cloud: () => `<path ${LN} d="${bumpy(42, 17, 7)} Z"/>`,
+  tree: () => `<path ${LN} d="M-11,62 C-7,40 -7,20 -9,-4 L9,-4 C7,20 7,40 13,62 C6,58 -4,58 -11,62 Z"/>
+    <path ${LN} d="${bumpy(52, 44, 11, 0, Math.PI * 2, -42)} Z"/>
+    <path ${OPEN} d="M-3,-6 C-4,-20 -10,-30 -18,-38 M3,-8 C6,-22 12,-30 20,-40 M0,-12 L1,-48"/>`,
+  bush: () => `<path ${LN} d="${bumpy(52, 36, 7, Math.PI, Math.PI * 2, 18)} Z"/>`,
+  rock: () => `<path ${LN} d="M-42,16 C-42,-4 -24,-20 -2,-20 C22,-20 40,-6 42,16 Z"/><path ${OPEN} d="M6,-10 L0,0 L8,6"/>`,
+  bird: () => `<path ${LN} d="M-16,4 L-30,-4 L-27,10 Z"/>
+    <path ${LN} d="M-18,4 C-16,-12 4,-16 12,-8 C20,-2 16,12 2,14 C-8,15 -16,12 -18,4 Z"/>
+    <path ${LN} d="M-7,1 C-1,-6 8,-4 6,4 C2,9 -4,7 -7,1 Z"/>
+    <circle ${LN} cx="12" cy="-13" r="9"/><path ${LN} d="M20,-15 L28,-12 L20,-9 Z"/><circle ${DOT} cx="14" cy="-15" r="1.7"/>
+    <path ${OPEN} d="M-2,14 L-3,20 M4,13 L4,20"/>`,
+  // Chim đang bay: dang hai cánh
+  birdfly: () => `<path ${LN} d="M-14,2 L-26,-4 L-24,8 Z"/>
+    <path ${LN} d="M-16,2 C-12,-8 6,-10 12,-4 C18,2 12,10 0,10 C-8,10 -14,8 -16,2 Z"/>
+    <path ${LN} d="M-4,-2 C-10,-20 -2,-26 6,-24 C6,-14 4,-8 2,-3 Z"/>
+    <circle ${LN} cx="12" cy="-8" r="7.5"/><path ${LN} d="M19,-10 L26,-7 L19,-5 Z"/><circle ${DOT} cx="14" cy="-10" r="1.5"/>`,
+  duck: () => `<path ${LN} d="M-24,2 C-26,-6 -22,-10 -18,-6 C-10,-4 2,-6 8,-4 C10,-14 12,-22 20,-22 C28,-22 30,-14 26,-8 C24,-4 22,0 22,4 C22,14 10,18 -4,18 C-18,18 -24,12 -24,2 Z"/>
+    <path ${LN} d="M27,-17 C34,-18 38,-15 36,-12 C32,-11 29,-12 27,-13 Z"/>
+    <circle ${DOT} cx="22" cy="-15" r="1.8"/>
+    <path ${OPEN} d="M-12,4 C-4,0 6,2 10,8 C2,12 -8,10 -12,4 Z"/>`,
+  fish: () => `<path ${LN} d="M-16,0 L-31,-11 L-29,11 Z"/><ellipse ${LN} rx="20" ry="11"/>
+    <path ${OPEN} d="M-5,-10 C-8,-3 -8,3 -5,10 M3,-11 C0,-3 0,3 3,11"/><circle ${DOT} cx="11" cy="-3" r="2"/><path ${OPEN} d="M17,4 L20,4"/>`,
+  flower: () => `${Array.from({ length: 5 }, (_, i) => { const a = i * Math.PI * 2 / 5 - Math.PI / 2; return `<circle ${LN} cx="${(7 * Math.cos(a)).toFixed(1)}" cy="${(7 * Math.sin(a)).toFixed(1)}" r="5.5"/>`; }).join("")}<circle ${LN} r="4.5"/>`,
+  apple: () => `<path ${LN} d="M0,-6 C-10,-14 -18,-4 -15,6 C-12,16 -4,18 0,15 C4,18 12,16 15,6 C18,-4 10,-14 0,-6 Z"/>
+    <path ${OPEN} d="M0,-6 L2,-14"/><path ${LN} d="M2,-12 C7,-18 13,-15 12,-12 C8,-10 4,-10 2,-12 Z"/>`,
+  butterfly: () => `<path ${LN} d="M0,-2 C-6,-18 -22,-18 -18,-4 C-16,2 -6,2 0,-2 Z"/><path ${LN} d="M0,-2 C6,-18 22,-18 18,-4 C16,2 6,2 0,-2 Z"/>
+    <path ${LN} d="M0,1 C-6,3 -16,8 -12,15 C-8,19 -2,11 0,1 Z"/><path ${LN} d="M0,1 C6,3 16,8 12,15 C8,19 2,11 0,1 Z"/>
+    <ellipse ${LN} rx="2.4" ry="11"/><path ${OPEN} d="M-1,-10 C-3,-15 -6,-17 -8,-18 M1,-10 C3,-15 6,-17 8,-18"/>`,
+  grass: () => `<path ${OPEN} d="M-9,0 L-6,-8 L-3,0 L0,-11 L3,0 L6,-7 L9,0"/>`,
+  // Lớp học
+  clock: () => `<circle ${LN} r="19"/><circle ${LN} r="15"/>
+    <path ${OPEN} d="M0,-13 L0,-10 M13,0 L10,0 M0,13 L0,10 M-13,0 L-10,0 M0,0 L0,-8 M0,0 L6,3"/><circle ${DOT} r="1.6"/>`,
+  map: () => `<path ${LN} d="M-32,-20 L-11,-24 L11,-20 L32,-24 L32,20 L11,24 L-11,20 L-32,24 Z"/>
+    <path ${OPEN} d="M-11,-24 L-11,20 M11,-20 L11,24"/>
+    <path ${OPEN} d="M-26,-8 C-22,-14 -14,-12 -16,-4 C-18,2 -24,0 -26,-8 Z M2,-12 C8,-14 14,-8 10,-2 C6,4 0,8 -2,2 C-4,-4 -2,-10 2,-12 Z M18,6 C22,2 28,6 26,12 C22,16 16,12 18,6 Z"/>`,
+  picture: () => `<rect ${LN} x="-28" y="-22" width="56" height="44" rx="2"/><rect ${LN} x="-22" y="-16" width="44" height="32"/>
+    <path ${OPEN} d="M-22,12 L-10,-2 L-2,6 L8,-6 L22,10"/><circle ${LN} cx="12" cy="-9" r="4"/>`,
+  window: () => `<rect ${LN} x="-28" y="-26" width="56" height="52" rx="2"/><path ${OPEN} d="M0,-26 L0,26 M-28,0 L28,0"/>`,
+  computer: () => `<path ${LN} d="M-6,16 L-8,24 L8,24 L6,16 Z"/><rect ${LN} x="-26" y="-22" width="52" height="38" rx="3"/><rect ${LN} x="-21" y="-17" width="42" height="28" rx="1"/>
+    <path ${LN} d="M-16,24 L16,24 L20,29 L-20,29 Z"/>`,
+  book: () => `<path ${LN} d="M-20,-4 L14,-8 L22,0 L-12,4 Z"/><path ${LN} d="M-12,4 L22,0 L22,6 L-12,10 Z"/><path ${LN} d="M-20,-4 L-12,4 L-12,10 L-20,2 Z"/>
+    <path ${OPEN} d="M-8,6 L18,3"/>`,
+  pencil: () => `<path ${LN} d="M-20,-3.5 L12,-3.5 L20,0 L12,3.5 L-20,3.5 Z"/><path ${OPEN} d="M12,-3.5 L12,3.5 M-14,-3.5 L-14,3.5"/><path ${DOT} d="M17,-1.3 L20,0 L17,1.3 Z"/>`,
+  crayon: () => `<path ${LN} d="M-14,-5 L8,-5 L16,-2 L16,2 L8,5 L-14,5 Z"/><path ${OPEN} d="M-8,-5 L-8,5 M4,-5 L4,5"/>`,
+  pen: () => `<path ${LN} d="M-20,-3 L10,-3 L18,0 L10,3 L-20,3 Z"/><path ${OPEN} d="M-2,-3 L-2,3 M-16,-3 L-16,-6 L-6,-6"/>`,
+  eraser: () => `<rect ${LN} x="-13" y="-6" width="26" height="12" rx="3"/><path ${OPEN} d="M-2,-6 L-2,6"/>`,
+  paper: () => `<path ${LN} d="M-18,-8 L14,-12 L20,6 L-12,10 Z"/><path ${OPEN} d="M-12,-4 L12,-7 M-10,1 L14,-2 M-8,6 L10,3"/>`,
+};
+const put = (name, x, y, s = 1, flip = false, rot = 0) => `<g transform="translate(${x},${y})${rot ? ` rotate(${rot})` : ""} scale(${flip ? -s : s},${s})">${SPR[name]()}</g>`;
+const sceneSvg = (bg, parts, label) => `<svg class="scene-svg" viewBox="0 0 400 280" role="img" aria-label="${esc(label)}" xmlns="http://www.w3.org/2000/svg"><rect x="1" y="1" width="398" height="278" rx="6" fill="#fff" stroke="#222" stroke-width="2"/>${bg}${parts.join("")}</svg>`;
+
+const SCN_VI = { bird: "con chim", duck: "con vịt", fish: "con cá", butterfly: "con bướm", apple: "quả táo", sun: "mặt trời", moon: "mặt trăng", cloud: "đám mây", star: "ngôi sao", flower: "bông hoa",
+  book: "quyển sách", pencil: "bút chì", pen: "bút mực", crayon: "bút sáp màu", eraser: "cục tẩy", paper: "tờ giấy", computer: "máy tính", clock: "đồng hồ", map: "bản đồ", picture: "bức tranh" };
+const LOC = { tree: ["in the tree", "trên cây"], rock: ["on the rock", "trên hòn đá"], river: ["in the river", "dưới sông"], sky: ["in the sky", "trên bầu trời"],
+  flower: ["on the flower", "trên bông hoa"], bush: ["on the bush", "trên bụi cây"], desk: ["on the desk", "trên bàn"], chair: ["on the chair", "trên ghế"], wall: ["on the wall", "trên tường"] };
+const plw = w => w === "fish" ? "fish" : plural(w);
+
+/* Từ các sự thật trong tranh sinh câu đúng / sai.
+   fact = { o: vật, n: số lượng (0 = không có), at: chỗ, alt: các chỗ khác có thể nói sai, cnt: có đếm được không } */
+function sceneStatements(facts, eow) {
+  const out = [], there = eow >= 4;
+  const name = (o, n) => n === 1 ? `the ${o}` : `the ${plw(o)}`;
+  for (const f of facts) {
+    const vo = SCN_VI[f.o];
+    if (f.n > 0) {
+      const [L, Lv] = LOC[f.at], be = f.n === 1 ? "is" : "are";
+      // Vị trí: đúng ở chỗ thật, sai ở chỗ khác
+      out.push({ k: f.o, yes: true, s: `${cap(name(f.o, f.n))} ${be} ${L}.`, vi: `${cap(vo)} ở ${Lv}.`, see: `Trong tranh, ${vo} ở ${Lv}.` });
+      for (const a of f.alt || []) out.push({ k: f.o, yes: false, s: `${cap(name(f.o, f.n))} ${be} ${LOC[a][0]}.`, vi: `${cap(vo)} ở ${LOC[a][1]}.`, see: `Trong tranh, ${vo} ở ${Lv}, không phải ${LOC[a][1]}.` });
+      // Số lượng (Unit 4: There is / There are)
+      if (there && f.cnt) {
+        const sayN = n => n === 1 ? `There is ${an(f.o)} ${L}.` : `There are ${NUMW[n]} ${plw(f.o)} ${L}.`;
+        out.push({ k: f.o + "#", yes: true, s: sayN(f.n), vi: `Có ${f.n} ${vo} ${Lv}.`, see: `Con đếm ${vo} ${Lv}: có ${f.n}.` });
+        const m = f.n + (f.n > 1 && Math.random() < .5 ? -1 : 1);
+        out.push({ k: f.o + "#", yes: false, s: sayN(m), vi: `Có ${m} ${vo} ${Lv}.`, see: `Con đếm ${vo} ${Lv}: chỉ có ${f.n} thôi.` });
+      }
+    } else if (f.at) {
+      // Vật không có trong tranh
+      const [L, Lv] = LOC[f.at];
+      out.push({ k: f.o, yes: false, s: there ? `There is ${an(f.o)} ${L}.` : `The ${f.o} is ${L}.`, vi: there ? `Có ${vo} ${Lv}.` : `${cap(vo)} ở ${Lv}.`, see: `Trong tranh không có ${vo}.` });
+    }
+  }
+  return out;
+}
+
+/* Chủ đề thiên nhiên (Unit 2) */
+function natureScene(ok) {
+  const parts = [], facts = [];
+  const grassAt = [[30, 172], [170, 168], [222, 180], [382, 176], [60, 262], [160, 266], [270, 262], [384, 266]];
+  // Trời: mặt trời hoặc mặt trăng (có mặt trăng thì có sao), mây
+  const night = Math.random() < .4, sky = night ? "moon" : "sun";
+  parts.push(put(sky, 292, 48, .9));
+  facts.push({ o: sky, n: 1, at: "sky" }, { o: night ? "sun" : "moon", n: 0, at: "sky" });
+  const nc = 1 + rnd(3);
+  [[228, 64, .8], [350, 52, .75], [342, 100, .6]].slice(0, nc).forEach(([x, y, s]) => parts.push(put("cloud", x, y, s)));
+  facts.push({ o: "cloud", n: nc, at: "sky", cnt: true });
+  if (night) {
+    const ns = 2 + rnd(3);
+    [[200, 26], [258, 18], [380, 22], [180, 92], [380, 138]].slice(0, ns).forEach(([x, y]) => parts.push(put("star", x, y, .8)));
+    facts.push({ o: "star", n: ns, at: "sky", cnt: true });
+  }
+  parts.push(put("tree", 92, 128, 1.05), put("bush", 300, 168, .95), put("rock", 336, 238, .95));
+  // Hoa trên bụi cây
+  const nf = 2 + rnd(4), fl = [[272, 150], [300, 136], [326, 152], [312, 168], [286, 168]].slice(0, nf);
+  fl.forEach(([x, y]) => parts.push(put("flower", x, y, .9)));
+  facts.push({ o: "flower", n: nf, at: "bush", cnt: true });
+  // Cá dưới sông
+  if (ok("fish")) {
+    const n = 1 + rnd(4);
+    [[140, 214], [196, 226, 1], [252, 214], [86, 228, 1]].slice(0, n).forEach(([x, y, f]) => parts.push(put("fish", x, y, .72, !!f)));
+    facts.push({ o: "fish", n, at: "river", alt: ["tree"], cnt: true });
+  }
+  // Hòn đá: chim hoặc vịt hoặc để trống; chim còn có thể ở trên cây / bay trên trời; vịt có thể bơi dưới sông
+  const rockBy = one(["bird", ok("duck") ? "duck" : "bird", null]);
+  let birdAt = rockBy === "bird" ? "rock" : one(["tree", "tree", "sky", null]);
+  if (birdAt === "rock") parts.push(put("bird", 340, 204, .8));
+  if (birdAt === "tree") parts.push(put("bird", 104, 74, .8));
+  if (birdAt === "sky") parts.push(put("birdfly", 186, 52, .8));
+  facts.push(birdAt ? { o: "bird", n: 1, at: birdAt, alt: ["tree", "rock", "sky"].filter(a => a !== birdAt).slice(0, 2) } : { o: "bird", n: 0, at: one(["tree", "rock"]) });
+  if (ok("duck")) {
+    const duckAt = rockBy === "duck" ? "rock" : one(["river", null]);
+    if (duckAt === "rock") parts.push(put("duck", 338, 204, .75));
+    if (duckAt === "river") parts.push(put("duck", 46, 212, .7));
+    facts.push(duckAt ? { o: "duck", n: 1, at: duckAt, alt: [duckAt === "rock" ? "river" : "rock"] } : { o: "duck", n: 0, at: rockBy || birdAt === "rock" ? "river" : "rock" });
+  }
+  // Táo trên cây
+  if (ok("apple")) {
+    const n = rnd(4);
+    [[62, 96], [128, 104], [74, 58]].slice(0, n).forEach(([x, y]) => parts.push(put("apple", x, y, .8)));
+    facts.push(n ? { o: "apple", n, at: "tree", alt: ["bush"], cnt: true } : { o: "apple", n: 0, at: "tree" });
+  }
+  // Bướm: đậu trên hoa hoặc bay trên trời
+  const bfAt = one(["flower", "sky", null]);
+  if (bfAt === "flower") parts.push(put("butterfly", fl[0][0], fl[0][1] - 20, .6));
+  if (bfAt === "sky") parts.push(put("butterfly", 214, 122, .7));
+  facts.push(bfAt ? { o: "butterfly", n: 1, at: bfAt, alt: [bfAt === "flower" ? "rock" : "flower"] } : { o: "butterfly", n: 0, at: "flower" });
+  grassAt.forEach(([x, y], i) => parts.push(put("grass", x, y, i === 7 ? .8 : 1)));
+  const bg = `<path ${OPEN} d="M0,148 C30,132 60,134 90,146 S150,138 185,145 S250,130 290,142 S360,134 400,144"/>
+    <path ${OPEN} d="M0,197 C60,189 120,203 200,196 S330,191 400,198"/><path ${OPEN} d="M0,241 C80,233 150,247 240,239 S350,235 400,241"/>
+    <path ${OPEN} d="M30,212 h16 M112,230 h12 M228,232 h14 M290,214 h16 M372,214 h14"/>`;
+  return { svg: sceneSvg(bg, parts, "Tranh thiên nhiên"), facts };
+}
+
+/* Chủ đề lớp học (Unit 1) */
+function classroomScene(ok) {
+  const parts = [], facts = [];
+  // Tường: 2 trong 3 vật (đồng hồ, bản đồ, bức tranh), vật còn lại dùng cho câu sai
+  const wall = shuffle(["clock", "map", "picture"]), wallPos = [[62, 52], [178, 58], [300, 56]];
+  wall.slice(0, 2).forEach((o, i) => parts.push(put(o, ...wallPos[i], o === "clock" ? 1.1 : 1)));
+  facts.push(...wall.slice(0, 2).map(o => ({ o, n: 1, at: "wall", alt: ["desk"] })), { o: wall[2], n: 0, at: "wall" });
+  // Bàn: máy tính (có thể) + 2 loại đồ; ghế: 1 đồ hoặc để trống. Mỗi loại đồ chỉ ở một chỗ.
+  const things = shuffle(["book", "pencil", "crayon", "eraser", "paper", "pen"].filter(ok));
+  const pc = Math.random() < .5;
+  if (pc) parts.push(put("computer", 128, 112, 1));
+  facts.push(pc ? { o: "computer", n: 1, at: "desk", alt: ["chair"] } : { o: "computer", n: 0, at: "desk" });
+  const onDesk = things.slice(0, pc ? 2 : 3), onChair = Math.random() < .75 ? things[pc ? 2 : 3] : null;
+  const slots = pc ? [[200, 140], [252, 142]] : [[126, 140], [190, 142], [252, 140]];
+  onDesk.forEach((o, i) => {
+    const [x, y] = slots[i];
+    // Bút chì / bút sáp / bút mực có thể có nhiều cái (đếm được), các đồ khác 1 cái
+    const multi = ["pencil", "crayon", "pen"].includes(o), n = multi ? 1 + rnd(3) : 1;
+    for (let k = 0; k < n; k++) parts.push(put(o, x - (n - 1) * 7 + k * 14, y + (k % 2) * 3, .8, false, multi ? -62 : 0));
+    facts.push({ o, n, at: "desk", alt: ["chair"], cnt: multi });
+  });
+  if (onChair) { parts.push(put(onChair, 334, 178, .8)); facts.push({ o: onChair, n: 1, at: "chair", alt: ["desk"] }); }
+  const absent = things.filter(o => !onDesk.includes(o) && o !== onChair);
+  if (absent.length) facts.push({ o: absent[0], n: 0, at: one(["desk", "chair"]) });
+  const bg = `<path ${OPEN} d="M0,196 L400,196"/><path ${OPEN} d="M0,206 L400,206"/>
+    ${put("window", 370, 58, .75)}
+    <path ${LN} d="M100,150 L280,150 L294,160 L86,160 Z"/><rect ${LN} x="86" y="160" width="208" height="10"/>
+    <path ${LN} d="M96,170 L96,252 L106,252 L106,170 M274,170 L274,252 L284,252 L284,170"/>
+    <path ${LN} d="M312,186 L356,186 L356,194 L312,194 Z"/><path ${LN} d="M350,186 L350,128 L358,128 L358,186 Z M314,194 L314,252 L320,252 L320,194 Z M348,194 L348,252 L354,252 L354,194 Z"/>`;
+  return { svg: sceneSvg(bg, parts, "Tranh lớp học"), facts };
+}
+
+const SCENES = [{ u: 1, make: classroomScene }, { u: 2, make: natureScene }];
+// Bài Reading với tranh lớn: ví dụ (đúng) + 5 câu, chọn mỗi câu về một vật khác nhau nếu được. Chưa học tới chủ đề nào thì trả về null.
+function sceneReading(c) {
+  const ths = SCENES.filter(t => t.u <= c.eow);
+  if (!ths.length) return null;
+  const inScope = new Set(c.pool.map(x => x.en));
+  const th = wpick(ths, t => REC(c.eow - t.u));
+  const { svg, facts } = th.make(w => inScope.has(w));
+  const cand = shuffle(sceneStatements(facts.filter(f => inScope.has(f.o)), c.eow));
+  const want = [true, ...shuffle([true, true, false, false, Math.random() < .5])], used = new Set(), out = [];
+  for (const y of want) {
+    const s = cand.find(x => x.yes === y && !used.has(x.k) && !out.includes(x)) || cand.find(x => x.yes === y && !out.includes(x));
+    if (!s) return null;
+    used.add(s.k); out.push(s);
+  }
+  return { svg, items: out.map(s => ({ q: s.s, opts: ["Yes", "No"], ans: s.yes ? 0 : 1, hints: [
+    { t: "Con nghe câu này, rồi tìm trong tranh nhé.", say: s.s },
+    { t: `Câu nghĩa là: <b lang="vi">${esc(s.vi)}</b>` },
+    { t: esc(s.see) },
+  ] })) };
+}
+
 const K = "ABCDEFGH";
 const SECS = [["pho", "Phonetics"], ["voc", "Vocabulary"], ["gra", "Grammar"], ["rea", "Reading"], ["wri", "Writing"]];
 
@@ -1669,6 +1891,8 @@ function makeExam(eow, sg) {
       { t: `${esc(r.see)} Có giống câu không?` },
     ] };
   });
+  // Reading: tranh lớn chung cho cả bài nếu đã học tới chủ đề có tranh, không thì mỗi câu một tranh nhỏ
+  const big = sceneReading(c);
   const wri = many(6, () => genWrite(c));
   const parts = [
     { sec: "pho", head: "I. Phonetics", no: 1, en: "Look at the pictures and sounds. CIRCLE the correct answers.", vi: "Đọc âm, khoanh vào tranh có âm đó ở đầu từ.", lay: "pics", items: pho },
@@ -1676,7 +1900,7 @@ function makeExam(eow, sg) {
     { sec: "voc", no: 3, en: "Look, read, and WRITE letters in the boxes. There is an extra answer.", vi: "Nhìn tranh, đọc từ trong khung, viết chữ cái của từ đúng vào ô dưới tranh. Có một từ thừa.", lay: "bank", items: vocB, answers: bAns },
     { sec: "gra", head: "III. Grammar", no: 4, en: "Look and read. CIRCLE the correct answers.", vi: "Nhìn tranh, đọc câu hỏi, khoanh câu trả lời đúng.", lay: "qa", items: gra },
     { sec: "gra", no: 5, en: "Read and CIRCLE the correct answers.", vi: "Đọc câu, chọn từ đúng điền vào chỗ trống.", lay: "gap", items: gap },
-    { sec: "rea", head: "IV. Reading", no: 6, en: "Look and read. CIRCLE the correct answer.", vi: "Nhìn tranh, đọc câu. Câu đúng với tranh chọn Yes, sai chọn No.", lay: "yn", items: rea },
+    { sec: "rea", head: "IV. Reading", no: 6, en: "Look and read. CIRCLE the correct answer.", vi: "Nhìn tranh, đọc câu. Câu đúng với tranh chọn Yes, sai chọn No.", lay: "yn", items: big ? big.items : rea, scene: big && big.svg },
     { sec: "wri", head: "V. Writing", no: 7, en: "Look. CIRCLE the correct answer. WRITE.", vi: "Nhìn tranh, chọn chữ cái còn thiếu trong từ.", lay: "write", items: wri, pts: 2 },
   ];
   let id = 0, n = 0;
@@ -1821,6 +2045,7 @@ function examPage(T) {
   const partHtml = (p, pi) => `<section class="paper">
     ${p.head ? `<div class="sec-h"><h3>${p.head}</h3></div>` : ""}
     <p class="instr">${p.no}. ${p.en} There is one example. <span class="pts">(${T.done ? score(p.items) : "……"}/${maxOf(p.items)} pts)</span>${S.vi ? `<small>${p.vi}</small>` : ""}</p>
+    ${p.scene ? `<div class="scene-pic">${p.scene}</div>` : ""}
     ${p.lay === "bank" ? bankHtml(p, pi) : p.items.map(it => qHtml(p, it)).join("")}
   </section>`;
 
