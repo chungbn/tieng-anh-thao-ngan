@@ -85,6 +85,8 @@ button:focus-visible { outline: 3px solid var(--sky); outline-offset: 3px; }
   font-family: var(--display); font-weight: 800; font-size: 22px; padding: 4px 14px; border-radius: 999px;
   font-variant-numeric: tabular-nums;
 }
+.xopt { display: grid; justify-items: center; gap: 6px; margin-top: 16px; text-align: center; }
+.xopt small { color: var(--muted); font-weight: 700; font-size: 14px; }
 .settings { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
 .toggle { display: inline-flex; align-items: center; gap: 8px; font-size: 15px; padding: 8px 12px; }
 .toggle .sw { width: 34px; height: 20px; border-radius: 99px; background: var(--line); position: relative; transition: background .15s; }
@@ -1909,10 +1911,10 @@ function makeExam(eow, sg) {
     it.sel = it.ex ? it.ans : null;
     if (!it.ex) it.n = ++n;
   });
-  return { eow, sg, parts, done: false };
+  return { eow, sg, parts, done: false, hints: EXAM.hints };
 }
 
-const EXAM = { eow: store.get("x:eow", 1), sg: Math.min(store.get("x:sg", 1), SG_UNITS.length) };
+const EXAM = { eow: store.get("x:eow", 1), sg: Math.min(store.get("x:sg", 1), SG_UNITS.length), hints: store.get("x:hints", true) };
 const eowName = i => i === 0 ? "Welcome" : "Unit " + i;
 // Chọn bài bé đang học tới (dùng chung cho Bài kiểm tra và Luyện đọc từ)
 const scopeHtml = () => `
@@ -1949,14 +1951,21 @@ function examSetup() {
       </div>
       <p class="xmeta" id="scope"></p>
     </div>
+    <div class="xopt"><button class="btn toggle" id="t-hint" aria-pressed="${EXAM.hints}"><span class="sw"></span>💡 Cho dùng gợi ý khi làm bài</button>
+      <small id="hint-note">${EXAM.hints ? "Mỗi câu có 3 mức gợi ý, số gợi ý đã dùng được ghi vào kết quả." : "Làm như thi thật: không có nút gợi ý."}</small></div>
     <div class="row"><button class="btn primary" id="make" style="font-size:22px;padding:14px 28px">📝 Tạo đề</button></div>
-    ${hist.length ? `<div class="section-label" style="margin-top:26px">Các lần làm gần đây</div><div class="hist">${hist.slice(0, 6).map(h => `<div><span>${new Date(h.t).toLocaleDateString("vi-VN")} · EOW ${eowName(h.eow)} · SG Unit ${h.sg}</span><b>${h.hints ? `<small>💡${h.hints}</small> ` : ""}${h.total}/${h.max}</b></div>`).join("")}</div>` : ""}`;
+    ${hist.length ? `<div class="section-label" style="margin-top:26px">Các lần làm gần đây</div><div class="hist">${hist.slice(0, 6).map(h => `<div><span>${new Date(h.t).toLocaleDateString("vi-VN")} · EOW ${eowName(h.eow)} · SG Unit ${h.sg}</span><b>${h.noHint ? `<small>Không gợi ý</small> ` : h.hints ? `<small>💡${h.hints}</small> ` : ""}${h.total}/${h.max}</b></div>`).join("")}</div>` : ""}`;
   document.getElementById("back").onclick = () => go(home);
   const paint = () => {
     document.getElementById("scope").textContent = `Kiến thức từ đầu tới ${eowName(EXAM.eow)} (Explore Our World) và Unit ${EXAM.sg} (Sounds Great, chữ ${SG_UNITS.slice(0, EXAM.sg).flatMap(u => u.letters).map(l => l.L.toUpperCase()).join(" ")}). Bài đang học và bài ngay trước được ra nhiều câu hơn.`;
   };
   bindScope(paint);
   paint();
+  document.getElementById("t-hint").onclick = e => {
+    EXAM.hints = !EXAM.hints; store.set("x:hints", EXAM.hints);
+    e.currentTarget.setAttribute("aria-pressed", EXAM.hints);
+    document.getElementById("hint-note").textContent = EXAM.hints ? "Mỗi câu có 3 mức gợi ý, số gợi ý đã dùng được ghi vào kết quả." : "Làm như thi thật: không có nút gợi ý.";
+  };
   document.getElementById("make").onclick = () => go(() => examPage(makeExam(EXAM.eow, EXAM.sg)));
 }
 
@@ -1982,7 +1991,7 @@ function examPage(T) {
   // Nút gợi ý (hoặc số gợi ý đã dùng khi đã nộp) + nhãn Ví dụ / dấu chấm đúng sai
   const markHtml = it => {
     const hl = it.hl || 0;
-    const hb = it.ex || !it.hints ? "" : T.done ? (hl ? `<span class="hu" title="Số gợi ý đã dùng">💡${hl}</span>` : "")
+    const hb = it.ex || !it.hints || !T.hints ? "" : T.done ? (hl ? `<span class="hu" title="Số gợi ý đã dùng">💡${hl}</span>` : "")
       : `<button class="hintb noprint" data-h="${it.id}"${hl >= 3 ? " disabled" : ""} aria-label="Gợi ý (đã dùng ${hl}/3)">💡<span class="ht"> Gợi ý</span> <i>${hl}/3</i></button>`;
     return hb + (it.ex ? `<span class="exb">Ví dụ</span>` : T.done ? (it.sel === it.ans ? `<span class="mk ok" aria-label="Đúng">✓</span>` : `<span class="mk no" aria-label="Sai">✗</span>`) : "");
   };
@@ -2053,13 +2062,13 @@ function examPage(T) {
     <div class="top noprint"><button class="btn back" id="back">← Chọn bài</button><span class="grow"></span><button class="btn" id="print">🖨️ In đề</button><button class="btn sun" id="new">🔄 Đề khác</button></div>
     <div id="exam">
       <section class="paper xhead">
-        <div><h2>PRACTICE TEST</h2><p class="xmeta">Môn Tiếng Anh · Lớp 1 · Thời gian làm bài: 40 phút<br>Explore Our World 1: tới ${eowName(T.eow)} · Sounds Great 1: tới Unit ${T.sg} (${letters[0].L.toUpperCase()}–${letters[letters.length - 1].L.toUpperCase()})</p></div>
+        <div><h2>PRACTICE TEST</h2><p class="xmeta">Môn Tiếng Anh · Lớp 1 · Thời gian làm bài: 40 phút<br>Explore Our World 1: tới ${eowName(T.eow)} · Sounds Great 1: tới Unit ${T.sg} (${letters[0].L.toUpperCase()}–${letters[letters.length - 1].L.toUpperCase()})<span class="noprint">${T.hints ? "" : " · Không dùng gợi ý"}</span></p></div>
         <label class="namebox">Họ và tên: <input id="nm" value="${esc(store.get("x:name", ""))}" autocomplete="off" spellcheck="false"></label>
         <div class="scores">${SECS.map(([k, t]) => `<div class="sc"><small>${t}</small><b>${T.done ? score(bySec(k)) : "…"}/${maxOf(bySec(k))}</b></div>`).join("")}<div class="sc tot"><small>Tổng điểm</small><b>${T.done ? total : "…"}/${max}</b></div></div>
         ${T.done ? `<div class="result"><div class="bigstars">${[1, 2, 3].map(i => `<span style="${i <= stars ? "" : "opacity:.2;filter:grayscale(1)"}">⭐</span>`).join("")}</div>
           <h3>${["", "Good try!", "Great job!", "Excellent!"][stars]}</h3>
           <p>${wrong ? `Con sai ${wrong} câu. Ô đỏ là con chọn sai, ô xanh là đáp án đúng.` : "Con làm đúng hết! Giỏi quá!"}</p>
-          <p>${usedHints ? `Con đã dùng ${usedHints} gợi ý (💡 cạnh câu hỏi). Lần sau thử làm ít gợi ý hơn nhé!` : "Con không cần gợi ý nào. Tuyệt vời!"}</p></div>` : ""}
+          <p>${!T.hints ? "Con làm bài không có gợi ý, như thi thật." : usedHints ? `Con đã dùng ${usedHints} gợi ý (💡 cạnh câu hỏi). Lần sau thử làm ít gợi ý hơn nhé!` : "Con không cần gợi ý nào. Tuyệt vời!"}</p></div>` : ""}
       </section>
       ${T.parts.map((p, pi) => partHtml(p, pi)).join("")}
       <div class="xfoot noprint">${T.done
@@ -2084,7 +2093,7 @@ function examPage(T) {
     document.getElementById("home2").onclick = () => go(home);
     if (!T.saved) {
       T.saved = true;
-      store.set("x:hist", [{ t: Date.now(), eow: T.eow, sg: T.sg, total, max, hints: usedHints }, ...store.get("x:hist", [])].slice(0, 20));
+      store.set("x:hist", [{ t: Date.now(), eow: T.eow, sg: T.sg, total, max, hints: usedHints, noHint: !T.hints }, ...store.get("x:hist", [])].slice(0, 20));
       if (stars >= 2) burst();
       speak(["", "Good try!", "Great job!", "Excellent!"][stars]);
     }
