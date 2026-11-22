@@ -366,48 +366,40 @@ button:focus-visible { outline: 3px solid var(--sky); outline-offset: 3px; }
 .ch.cut { border-style: dashed; }
 .ch.cut > * { opacity: .25; }
 .ch.cut::after { content: "✕"; position: absolute; inset: 0; display: grid; place-items: center; font-size: 40px; color: var(--tomato); -webkit-text-fill-color: var(--tomato); text-decoration: none; }
-/* Bài nối cột: câu hỏi trái, câu trả lời phải, đường nối vẽ bằng SVG */
-.mgrid { position: relative; display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); column-gap: 64px; margin-top: 14px; }
-.mcol { display: grid; gap: 10px; align-content: start; position: relative; z-index: 1; }
-.mcol + .mcol { align-content: space-around; }
-.mlines { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; z-index: 2; }
-.mlines path { fill: none; stroke: var(--sky); stroke-width: 3; stroke-linecap: round; }
-.mlines path.ex { stroke: var(--muted); stroke-dasharray: 2 6; }
-.mlines path.ok { stroke: var(--leaf); }
-.mlines path.no { stroke: var(--tomato); }
-.mlines path.fix { stroke: var(--leaf); stroke-dasharray: 8 7; opacity: .8; }
-.mq, .ma { position: relative; border: 3px solid var(--line); background: var(--card); border-radius: 16px; padding: 8px 10px; min-width: 0; }
-.mq { display: grid; gap: 6px; cursor: pointer; }
-.mq.ex { opacity: .7; cursor: default; }
-.mq .qhead { flex-wrap: wrap; gap: 6px 8px; }
-.mq .qp { width: 64px; height: 56px; font-size: 38px; border-radius: 12px; }
-.mq .qt { font-size: 18px; }
-.mq .hints p { font-size: 14px; }
-.ma { display: flex; align-items: center; gap: 8px; text-align: left; font-family: var(--display); font-weight: 700; font-size: 17px; line-height: 1.2; overflow-wrap: anywhere; color: var(--ink); }
-.ma:disabled { cursor: default; opacity: 1; -webkit-text-fill-color: currentColor; }
-.ma .k { flex: none; width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--muted); display: grid; place-items: center; font-weight: 800; font-size: 14px; color: var(--muted); }
-.mq.on, .ma.on { border-color: var(--sun); box-shadow: 0 0 0 3px var(--sun); }
-.mq.linked, .ma.linked { border-color: var(--sky); }
-.ma.linked .k { background: var(--sky); border-color: var(--sky); color: #fff; }
-.mq.ex, .ma.linked:disabled { border-color: var(--line); }
-.ma.linked:disabled .k { background: var(--muted); border-color: var(--muted); }
-.ma.cut { border-style: dashed; }
-.ma.cut > :not(.dot) { opacity: .25; }
-.ma.cut::after { content: "✕"; position: absolute; inset: 0; display: grid; place-items: center; font-size: 28px; color: var(--tomato); -webkit-text-fill-color: var(--tomato); }
-.dot { position: absolute; top: 50%; width: 14px; height: 14px; margin-top: -7px; border-radius: 50%; background: var(--card); border: 3px solid var(--muted); }
-.mq .dot { right: -9px; }
-.ma .dot { left: -9px; }
-.linked .dot { border-color: var(--sky); background: var(--sky); }
+/* Bài khung từ: viết chữ cái của từ vào ô dưới tranh */
+.wbank { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 128px), 1fr)); gap: 6px 8px; border: 2px solid var(--ink); border-radius: 12px; padding: 10px; margin-top: 12px; }
+.wb { text-align: left; border: 2px solid transparent; background: var(--bg); border-radius: 12px; padding: 6px 10px; font-family: var(--display); font-weight: 700; font-size: 19px; line-height: 1.2; color: var(--ink); overflow-wrap: anywhere; min-width: 0; }
+.wb b { color: var(--sky); }
+.wb:disabled { cursor: default; -webkit-text-fill-color: currentColor; }
+.wb.ex { text-decoration: line-through; opacity: .55; }
+.wb.used { opacity: .45; }
+.wb.cut { text-decoration: line-through; text-decoration-color: var(--tomato); text-decoration-thickness: 3px; opacity: .35; }
+.wb.on { border-color: var(--sun); box-shadow: 0 0 0 2px var(--sun); opacity: 1; }
+.bgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 10px; margin-top: 14px; }
+.bq { display: grid; justify-items: center; align-content: start; gap: 6px; border: 3px solid var(--line); border-radius: 16px; padding: 8px 6px; background: var(--card); cursor: pointer; min-width: 0; }
+.bq.ex { opacity: .7; cursor: default; }
+.bq.on { border-color: var(--sun); box-shadow: 0 0 0 3px var(--sun); }
+.bq .qp { width: 80px; height: 70px; font-size: 46px; }
+.brow { display: flex; align-items: center; gap: 6px; }
+.bq .qn { min-width: 0; font-size: 18px; }
+.bbox { width: 42px; height: 42px; border: 3px solid var(--ink); border-radius: 8px; display: grid; place-items: center; font-family: var(--display); font-weight: 800; font-size: 24px; color: var(--sky); background: var(--card); }
+.bq.right .bbox { border-color: var(--leaf); color: var(--leaf); }
+.bq.wrong .bbox { border-color: var(--tomato); color: var(--tomato); text-decoration: line-through; }
+.bfix { font-family: var(--display); font-weight: 800; font-size: 24px; color: var(--leaf); }
+.bq .hintb, .bq .hu, .bq .mk { margin-left: 0; }
+.bq .hintb { font-size: 13px; padding: 2px 8px; white-space: nowrap; }
+.bq .hintb .ht { display: none; }
+.bq .mk { font-size: 22px; }
+.bhint { margin-top: 12px; }
+
+.blank.gap { min-width: 3.2em; padding: 0 4px; }
+.q.gap .ch { font-size: 18px; overflow-wrap: normal; word-break: normal; }
 @media (max-width: 480px) {
-  .mgrid { grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); column-gap: 28px; }
-  .mq { padding: 7px 8px; }
-  .mq .hints p { padding: 6px 7px; gap: 4px; font-size: 13px; }
-  .mq .hints p > span > i { display: block; }
-  .mq .hints .say { width: 28px; height: 28px; font-size: 14px; }
-  .mq .qp { width: 52px; height: 46px; font-size: 30px; }
-  .mq .qt { font-size: 16px; }
-  .ma { font-size: 15px; padding: 7px 8px; gap: 6px; }
-  .mq .hintb { font-size: 13px; padding: 2px 8px; }
+  .wb { font-size: 16px; padding: 5px 8px; }
+  .q.gap .ch { font-size: 16px; gap: 6px; padding: 7px 8px; }
+  .q.gap .ch .k { width: 24px; height: 24px; font-size: 13px; }
+  .hintb .ht { display: none; }
+  .q.qa .qt { font-size: 19px; overflow-wrap: break-word; }
 }
 .xfoot { display: flex; gap: 12px; justify-content: center; align-items: center; flex-wrap: wrap; margin-top: 8px; }
 @media (min-width: 720px) {
@@ -424,11 +416,11 @@ button:focus-visible { outline: 3px solid var(--sky); outline-offset: 3px; }
   .ch.cut { border-style: solid; }
   .ch.cut > * { opacity: 1; }
   .ch.cut::after { display: none; }
-  .mgrid { break-inside: avoid; }
-  .mq.ex { opacity: 1; }
-  .mq.on, .ma.on { box-shadow: none; }
-  .ma.cut > :not(.dot) { opacity: 1; }
-  .ma.cut::after { display: none; }
+  .bankp { break-inside: avoid; }
+  .bq.on { box-shadow: none; }
+  .bq.ex { opacity: 1; }
+  .wb.used, .wb.cut { opacity: 1; text-decoration: none; }
+  .wb { background: none; }
   .ch, .qp { border-width: 1px; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } .burst { display: none; } }
@@ -1443,7 +1435,7 @@ function pickT(c, list) {
   return t;
 }
 
-/* Mẫu câu hỏi ngữ pháp theo từng unit Explore Our World: trả về câu hỏi, đáp án đúng và một đáp án sai (sai ngữ pháp hoặc sai nội dung tranh).
+/* Mẫu câu hỏi ngữ pháp theo từng unit Explore Our World: trả về câu hỏi, đáp án đúng và các đáp án sai (bad: mảng, sai ngữ pháp hoặc sai nội dung tranh; đề lấy 2).
    vi = nghĩa câu hỏi, tip = mẹo trả lời (dùng cho gợi ý) */
 const TIP_AN = "Từ bắt đầu bằng a, e, i, o, u thì dùng <b>an</b>, chữ khác dùng <b>a</b>.";
 const THING_VI = { bird: "chim", butterfly: "bướm" };
@@ -1451,38 +1443,71 @@ const PLACE_VI = { "in the tree": "trên cây", "on the flower": "trên bông ho
 const ACT_VI = { jump: "nhảy", run: "chạy", walk: "đi bộ" };
 function thisThat(c, s, p) {
   const x = c.pick(isNoun), far = s === "that";
-  if (Math.random() < .5) return { pic: P.one(x), q: `What's ${s}?`, ok: `It's ${an(x.en)}.`, bad: one([`They're ${plural(x.en)}.`, `It's ${wrongAn(x.en)}.`]), vi: far ? "Kia là cái gì?" : "Đây là cái gì?", tip: "Hỏi <b lang=\"vi\">một</b> vật → trả lời <b>It's a/an</b> + tên vật. " + TIP_AN };
-  return { pic: P.many(x.e, 3), q: `What are ${p}?`, ok: `They're ${plural(x.en)}.`, bad: one([`It's ${an(x.en)}.`, `They're ${x.en}.`]), vi: far ? "Những cái kia là gì?" : "Những cái này là gì?", tip: "Hỏi <b lang=\"vi\">nhiều</b> vật → trả lời <b>They're</b> + tên vật có thêm <b>s</b>." };
+  if (Math.random() < .5) return { pic: P.one(x), q: `What's ${s}?`, ok: `It's ${an(x.en)}.`, bad: [`They're ${plural(x.en)}.`, `It's ${wrongAn(x.en)}.`], vi: far ? "Kia là cái gì?" : "Đây là cái gì?", tip: "Hỏi <b lang=\"vi\">một</b> vật → trả lời <b>It's a/an</b> + tên vật. " + TIP_AN };
+  return { pic: P.many(x.e, 3), q: `What are ${p}?`, ok: `They're ${plural(x.en)}.`, bad: [`It's ${an(x.en)}.`, `They're ${x.en}.`], vi: far ? "Những cái kia là gì?" : "Những cái này là gì?", tip: "Hỏi <b lang=\"vi\">nhiều</b> vật → trả lời <b>They're</b> + tên vật có thêm <b>s</b>." };
 }
 const G = [
-  { u: 0, f: c => { const x = c.pick(isColor), y = c.pick(isColor, [x]); return { pic: P.one(x), q: "What color is it?", ok: `It's ${x.en}.`, bad: one([`It's ${y.en}.`, `They're ${x.en}.`]), vi: "Nó màu gì?", tip: "Hỏi màu → trả lời <b>It's</b> + màu. Con nhìn kỹ màu trong tranh nhé." }; } },
-  { u: 0, f: () => { const n = 5 + rnd(5), m = n + one([-1, 1]); return { pic: `<span class="age">🎂<b>${n}</b></span>`, q: "How old are you?", ok: `I'm ${NUMW[n]}.`, bad: `I'm ${NUMW[m]}.`, vi: "Con mấy tuổi?", tip: "Nhìn số trên bánh sinh nhật → trả lời <b>I'm</b> + số tuổi." }; } },
-  { u: 1, f: c => { const x = c.pick(isNoun), y = c.pick(isNoun, [x]); return { pic: P.one(x), q: "What is it?", ok: `It's ${an(x.en)}.`, bad: one([`It's ${wrongAn(x.en)}.`, `It's is ${an(x.en)}.`, `They're ${plural(x.en)}.`, `It's ${an(y.en)}.`]), vi: "Đây là cái gì?", tip: "Một vật → <b>It's a/an</b> + tên vật. " + TIP_AN }; } },
+  { u: 0, f: c => { const x = c.pick(isColor), y = c.pick(isColor, [x]); return { pic: P.one(x), q: "What color is it?", ok: `It's ${x.en}.`, bad: [`It's ${y.en}.`, `They're ${x.en}.`], vi: "Nó màu gì?", tip: "Hỏi màu → trả lời <b>It's</b> + màu. Con nhìn kỹ màu trong tranh nhé." }; } },
+  { u: 0, f: () => { const n = 5 + rnd(5), m = n + one([-1, 1]); return { pic: `<span class="age">🎂<b>${n}</b></span>`, q: "How old are you?", ok: `I'm ${NUMW[n]}.`, bad: [`I'm ${NUMW[m]}.`, `I ${NUMW[n]}.`], vi: "Con mấy tuổi?", tip: "Nhìn số trên bánh sinh nhật → trả lời <b>I'm</b> + số tuổi." }; } },
+  { u: 1, f: c => { const x = c.pick(isNoun), y = c.pick(isNoun, [x]); return { pic: P.one(x), q: "What is it?", ok: `It's ${an(x.en)}.`, bad: [`It's ${wrongAn(x.en)}.`, `It's is ${an(x.en)}.`, `They're ${plural(x.en)}.`, `It's ${an(y.en)}.`], vi: "Đây là cái gì?", tip: "Một vật → <b>It's a/an</b> + tên vật. " + TIP_AN }; } },
   { u: 1, f: c => {
     const x = c.pick(isNoun), tip = "Đúng như tranh → <b>Yes, it is.</b> Không đúng → <b>No, it isn't.</b>";
-    if (Math.random() < .5) return { pic: P.one(x), q: `Is it ${an(x.en)}?`, ok: "Yes, it is.", bad: one(["Yes, it's is.", "No, it isn't."]), vi: `Nó có phải là ${x.vi} không?`, tip };
+    if (Math.random() < .5) return { pic: P.one(x), q: `Is it ${an(x.en)}?`, ok: "Yes, it is.", bad: ["Yes, it's is.", "No, it isn't."], vi: `Nó có phải là ${x.vi} không?`, tip };
     const y = c.pick(isNoun, [x]);
-    return { pic: P.one(x), q: `Is it ${an(y.en)}?`, ok: `No, it isn't. It's ${an(x.en)}.`, bad: one([`No, it isn't. It's ${wrongAn(x.en)}.`, "Yes, it is."]), vi: `Nó có phải là ${y.vi} không?`, tip }; } },
-  { u: 1, f: c => { const x = c.pick(isNoun), n = 2 + rnd(6), m = n + one([-1, 1]); return { pic: P.many(x.e, n), q: `How many ${plural(x.en)}?`, ok: `${cap(NUMW[n])}.`, bad: `${cap(NUMW[m])}.`, vi: `Có bao nhiêu ${x.vi}?`, tip: "Con chỉ tay đếm từng hình trong tranh rồi chọn số đó." }; } },
-  { u: 2, f: c => { const x = c.pick(isNoun), y = c.pick(isNoun, [x]); return { pic: P.many(x.e, 3), q: "What are they?", ok: `They're ${plural(x.en)}.`, bad: one([`They're ${x.en}.`, `It's ${an(x.en)}.`, `They're ${plural(y.en)}.`]), vi: "Chúng là những cái gì?", tip: "Nhiều vật → <b>They're</b> + tên vật có thêm <b>s</b>." }; } },
-  { u: 2, f: () => { const t = one(Object.keys(THINGS)), [p, q] = sample(Object.keys(PLACES), 2); return { pic: P.scene(PLACES[p], THINGS[t]), q: `Where is the ${t}?`, ok: `It's ${p}.`, bad: `It's ${q}.`, vi: `Con ${THING_VI[t]} ở đâu?`, tip: "<b>in</b> = ở trong, <b>on</b> = ở trên. Con nhìn xem con vật đang ở đâu trong tranh." }; } },
-  { u: 3, f: c => { const x = c.pick(isFam), g = FAM[x.en], y = c.pick(z => FAM[z.en] === g, [x]), H = cap(he(g)); return { pic: P.one(x), q: `Who is ${he(g)}?`, ok: `${H}'s my ${x.en}.`, bad: one([`${H}'s my ${y.en}.`, `${H} my ${x.en}.`]), vi: "Người này là ai?", tip: "Trả lời <b>He's / She's my</b> + người trong nhà. Con nhìn tranh xem là ai." }; } },
+    return { pic: P.one(x), q: `Is it ${an(y.en)}?`, ok: `No, it isn't. It's ${an(x.en)}.`, bad: [`No, it isn't. It's ${wrongAn(x.en)}.`, "Yes, it is."], vi: `Nó có phải là ${y.vi} không?`, tip }; } },
+  { u: 1, f: c => { const x = c.pick(isNoun), n = 2 + rnd(6), m = n + one([-1, 1]); return { pic: P.many(x.e, n), q: `How many ${plural(x.en)}?`, ok: `${cap(NUMW[n])}.`, bad: [`${cap(NUMW[n - 1])}.`, `${cap(NUMW[n + 1])}.`], vi: `Có bao nhiêu ${x.vi}?`, tip: "Con chỉ tay đếm từng hình trong tranh rồi chọn số đó." }; } },
+  { u: 2, f: c => { const x = c.pick(isNoun), y = c.pick(isNoun, [x]); return { pic: P.many(x.e, 3), q: "What are they?", ok: `They're ${plural(x.en)}.`, bad: [`They're ${x.en}.`, `It's ${an(x.en)}.`, `They're ${plural(y.en)}.`], vi: "Chúng là những cái gì?", tip: "Nhiều vật → <b>They're</b> + tên vật có thêm <b>s</b>." }; } },
+  { u: 2, f: () => { const t = one(Object.keys(THINGS)), [p, q, q2] = sample(Object.keys(PLACES), 3); return { pic: P.scene(PLACES[p], THINGS[t]), q: `Where is the ${t}?`, ok: `It's ${p}.`, bad: [`It's ${q}.`, `It's ${q2}.`], vi: `Con ${THING_VI[t]} ở đâu?`, tip: "<b>in</b> = ở trong, <b>on</b> = ở trên. Con nhìn xem con vật đang ở đâu trong tranh." }; } },
+  { u: 3, f: c => { const x = c.pick(isFam), g = FAM[x.en], y = c.pick(z => FAM[z.en] === g, [x]), H = cap(he(g)); return { pic: P.one(x), q: `Who is ${he(g)}?`, ok: `${H}'s my ${x.en}.`, bad: [`${H}'s my ${y.en}.`, `${H} my ${x.en}.`], vi: "Người này là ai?", tip: "Trả lời <b>He's / She's my</b> + người trong nhà. Con nhìn tranh xem là ai." }; } },
   { u: 4, f: c => {
     const x = c.pick(isNoun), tip = "Hỏi <b>Is there…?</b> → trả lời <b>Yes, there is.</b> hoặc <b>No, there isn't.</b> Con nhìn xem tranh có vật đó không.";
-    if (Math.random() < .5) return { pic: P.one(x), q: `Is there ${an(x.en)}?`, ok: "Yes, there is.", bad: one(["Yes, it is.", "No, there isn't."]), vi: `Có ${x.vi} không?`, tip };
+    if (Math.random() < .5) return { pic: P.one(x), q: `Is there ${an(x.en)}?`, ok: "Yes, there is.", bad: ["Yes, it is.", "No, there isn't."], vi: `Có ${x.vi} không?`, tip };
     const y = c.pick(isNoun, [x]);
-    return { pic: P.one(x), q: `Is there ${an(y.en)}?`, ok: "No, there isn't.", bad: one(["Yes, there is.", "No, it isn't."]), vi: `Có ${y.vi} không?`, tip }; } },
-  { u: 4, f: c => { const x = c.pick(inL(ACT4)), y = c.pick(inL(ACT4), [x]), p = one(["he", "she"]); return { pic: P.one(x), q: `What is ${p} doing?`, ok: `${cap(p)}'s ${x.en}.`, bad: one([`${cap(p)}'s ${y.en}.`, `${cap(p)} ${x.en}.`]), vi: `${p === "he" ? "Bạn trai" : "Bạn gái"} ấy đang làm gì?`, tip: "Trả lời <b>He's / She's</b> + việc đang làm (có đuôi <b>ing</b>). Con nhìn tranh xem bạn ấy làm gì." }; } },
-  { u: 5, f: c => { const x = c.pick(inL(CLOTHES)), y = c.pick(inL(CLOTHES), [x]); return { pic: P.one(x), q: "What are you wearing?", ok: `I'm wearing ${wear(x.en)}.`, bad: one([`I'm wearing ${wear(y.en)}.`, `I wearing ${wear(x.en)}.`]), vi: "Con đang mặc gì?", tip: "Trả lời <b>I'm wearing</b> + quần áo (nhớ có <b>I'm</b>). Con nhìn tranh xem là đồ gì." }; } },
+    return { pic: P.one(x), q: `Is there ${an(y.en)}?`, ok: "No, there isn't.", bad: ["Yes, there is.", "No, it isn't."], vi: `Có ${y.vi} không?`, tip }; } },
+  { u: 4, f: c => { const x = c.pick(inL(ACT4)), y = c.pick(inL(ACT4), [x]), p = one(["he", "she"]); return { pic: P.one(x), q: `What is ${p} doing?`, ok: `${cap(p)}'s ${x.en}.`, bad: [`${cap(p)}'s ${y.en}.`, `${cap(p)} ${x.en}.`], vi: `${p === "he" ? "Bạn trai" : "Bạn gái"} ấy đang làm gì?`, tip: "Trả lời <b>He's / She's</b> + việc đang làm (có đuôi <b>ing</b>). Con nhìn tranh xem bạn ấy làm gì." }; } },
+  { u: 5, f: c => { const x = c.pick(inL(CLOTHES)), y = c.pick(inL(CLOTHES), [x]); return { pic: P.one(x), q: "What are you wearing?", ok: `I'm wearing ${wear(x.en)}.`, bad: [`I'm wearing ${wear(y.en)}.`, `I wearing ${wear(x.en)}.`], vi: "Con đang mặc gì?", tip: "Trả lời <b>I'm wearing</b> + quần áo (nhớ có <b>I'm</b>). Con nhìn tranh xem là đồ gì." }; } },
   { u: 5, f: c => thisThat(c, "that", "those") },
   { u: 6, f: c => thisThat(c, "this", "these") },
-  { u: 6, f: c => { const x = c.pick(inL(TOYS)), y = c.pick(inL(TOYS), [x]); return { pic: P.one(x), q: "What do you want?", ok: `I want ${an(x.en)}.`, bad: one([`I wants ${an(x.en)}.`, `I want ${an(y.en)}.`]), vi: "Con muốn gì?", tip: "Trả lời <b>I want</b> + a/an + đồ chơi. Với <b>I</b> thì <b>want</b> không thêm <b>s</b>." }; } },
-  { u: 7, f: () => { const a = one(Object.keys(ACT7)), yes = Math.random() < .5; return { pic: P.badge(ACT7[a], yes ? "✅" : "❌"), q: `Can you ${a}?`, ok: yes ? "Yes, I can." : "No, I can't.", bad: yes ? one(["No, I can't.", "Yes, I do."]) : one(["Yes, I can.", "No, I don't."]), vi: `Con có ${ACT_VI[a]} được không?`, tip: "✅ là làm được → <b>Yes, I can.</b> ❌ là không làm được → <b>No, I can't.</b>" }; } },
-  { u: 7, f: c => { const x = c.pick(inL(BODY)), y = c.pick(inL(BODY), [x]); return { pic: P.one(x), q: "What's this?", ok: `It's my ${x.en}.`, bad: `It's my ${y.en}.`, vi: "Đây là gì?", tip: "Trả lời <b>It's my</b> + bộ phận cơ thể. Con nhìn kỹ tranh nhé." }; } },
+  { u: 6, f: c => { const x = c.pick(inL(TOYS)), y = c.pick(inL(TOYS), [x]); return { pic: P.one(x), q: "What do you want?", ok: `I want ${an(x.en)}.`, bad: [`I wants ${an(x.en)}.`, `I want ${an(y.en)}.`], vi: "Con muốn gì?", tip: "Trả lời <b>I want</b> + a/an + đồ chơi. Với <b>I</b> thì <b>want</b> không thêm <b>s</b>." }; } },
+  { u: 7, f: () => { const a = one(Object.keys(ACT7)), yes = Math.random() < .5; return { pic: P.badge(ACT7[a], yes ? "✅" : "❌"), q: `Can you ${a}?`, ok: yes ? "Yes, I can." : "No, I can't.", bad: yes ? ["No, I can't.", "Yes, I do."] : ["Yes, I can.", "No, I don't."], vi: `Con có ${ACT_VI[a]} được không?`, tip: "✅ là làm được → <b>Yes, I can.</b> ❌ là không làm được → <b>No, I can't.</b>" }; } },
+  { u: 7, f: c => { const x = c.pick(inL(BODY)), y = c.pick(inL(BODY), [x]), z = c.pick(inL(BODY), [x, y]); return { pic: P.one(x), q: "What's this?", ok: `It's my ${x.en}.`, bad: [`It's my ${y.en}.`, `It's my ${z.en}.`], vi: "Đây là gì?", tip: "Trả lời <b>It's my</b> + bộ phận cơ thể. Con nhìn kỹ tranh nhé." }; } },
   { u: 8, f: c => {
     const x = c.pick(inL([...FOOD_C, ...FOOD_M])), yes = Math.random() < .5, f = FOOD_C.includes(x.en) ? plural(x.en) : x.en;
-    return { pic: P.badge(x.e, yes ? "👍" : "👎"), q: `Do you like ${f}?`, ok: yes ? "Yes, I do." : "No, I don't.", bad: yes ? one(["Yes, I am.", "No, I don't."]) : one(["No, I doesn't.", "Yes, I do."]), vi: `Con có thích ${x.vi} không?`, tip: "👍 là thích → <b>Yes, I do.</b> 👎 là không thích → <b>No, I don't.</b>" }; } },
-  { u: 8, f: c => { const x = c.pick(inL(FOOD_C)); return { pic: P.one(x), q: "What do you want?", ok: `I want ${an(x.en)}.`, bad: `I want ${wrongAn(x.en)}.`, vi: "Con muốn gì?", tip: TIP_AN }; } },
+    return { pic: P.badge(x.e, yes ? "👍" : "👎"), q: `Do you like ${f}?`, ok: yes ? "Yes, I do." : "No, I don't.", bad: yes ? ["Yes, I am.", "No, I don't."] : ["No, I doesn't.", "Yes, I do."], vi: `Con có thích ${x.vi} không?`, tip: "👍 là thích → <b>Yes, I do.</b> 👎 là không thích → <b>No, I don't.</b>" }; } },
+  { u: 8, f: c => { const x = c.pick(inL(FOOD_C)); return { pic: P.one(x), q: "What do you want?", ok: `I want ${an(x.en)}.`, bad: [`I want ${wrongAn(x.en)}.`, `I wants ${an(x.en)}.`], vi: "Con muốn gì?", tip: TIP_AN }; } },
+];
+/* Grammar 5: điền vào chỗ trống (___) trong cặp hỏi – đáp, chọn 1 trong 3; đáp án sai là lỗi ngữ pháp
+   (từ để hỏi, a/an, số nhiều, -ing, giới từ…). Hai chỗ trống thì phương án viết "x / y". vi = nghĩa câu, tip = mẹo (gợi ý). */
+const GF = [
+  { u: 0, f: () => ({ s: "___ old are you? – I'm six.", ok: "How", bad: ["What", "Who"], vi: "Con mấy tuổi? – Con sáu tuổi.", tip: "Hỏi tuổi dùng <b>How old</b>." }) },
+  { u: 0, f: () => ({ s: "What's your name? – ___ name is Tom.", ok: "My", bad: ["I", "Me"], vi: "Bạn tên là gì? – Tên tớ là Tom.", tip: "<b>My name</b> = tên của tớ." }) },
+  { u: 0, f: c => { const x = c.pick(isColor); return { s: `What color is it? – It's ___.`, ok: x.en, bad: [`a ${x.en}`, `${x.en}s`], vi: `Nó màu gì? – Nó ${x.vi}.`, tip: "Sau <b>It's</b> nói màu luôn, không thêm <b>a</b>, không thêm <b>s</b>." }; } },
+  { u: 1, f: c => { const x = c.pick(isNoun); return { s: `___ is it? – It's ${an(x.en)}.`, ok: "What", bad: ["Who", "How"], vi: `Đây là cái gì? – Đó là ${x.vi}.`, tip: "Hỏi đồ vật dùng <b>What</b>, hỏi người dùng <b>Who</b>." }; } },
+  { u: 1, f: c => { const x = c.pick(isNoun); return { s: `It's ___ ${x.en}.`, ok: /^[aeiou]/.test(x.en) ? "an" : "a", bad: [/^[aeiou]/.test(x.en) ? "a" : "an", "two"], vi: `Đó là ${x.vi}.`, tip: TIP_AN }; } },
+  { u: 1, f: c => { const x = c.pick(isNoun); return { s: `Is it ${an(x.en)}? – Yes, ___.`, ok: "it is", bad: ["it isn't", "it's is"], vi: `Nó có phải là ${x.vi} không? – Đúng rồi.`, tip: "Trả lời <b>Yes, it is.</b> hoặc <b>No, it isn't.</b>" }; } },
+  { u: 1, f: c => { const x = c.pick(isNoun), n = 2 + rnd(5); return { s: `How many ___? – ${cap(NUMW[n])} ___.`, ok: `${plural(x.en)} / ${plural(x.en)}`, bad: [`${x.en} / ${plural(x.en)}`, `${plural(x.en)} / ${x.en}`], vi: `Có bao nhiêu ${x.vi}? – ${n} ${x.vi}.`, tip: "Sau <b>How many</b> và sau số từ 2 trở lên, tên vật thêm <b>s</b>." }; } },
+  { u: 2, f: c => { const x = c.pick(isNoun); return { s: "What are they? – They're ___.", ok: plural(x.en), bad: [an(x.en), x.en], vi: `Chúng là gì? – Chúng là những ${x.vi}.`, tip: "<b>They're</b> (nhiều vật) → tên vật thêm <b>s</b>." }; } },
+  { u: 2, f: () => ({ s: "Where is the butterfly? – It's ___.", ok: "on the flower", bad: ["on flower", "a flower"], vi: "Con bướm ở đâu? – Nó ở trên bông hoa.", tip: "Chỉ chỗ: <b>in / on</b> + <b>the</b> + nơi chốn." }) },
+  { u: 2, f: () => ({ s: "___ is the moon? – It's in the sky.", ok: "Where", bad: ["What", "Who"], vi: "Mặt trăng ở đâu? – Nó ở trên bầu trời.", tip: "Hỏi ở đâu dùng <b>Where</b>." }) },
+  { u: 2, f: () => ({ s: "___ are in the tree.", ok: "The birds", bad: ["The bird", "A bird"], vi: "Những chú chim ở trên cây.", tip: "<b>are</b> đi với nhiều vật → tên vật thêm <b>s</b>." }) },
+  { u: 3, f: () => { const g = one(["F", "M"]); return { s: `___ ${he(g)}? – ${cap(he(g))}'s my ${g === "F" ? "sister" : "brother"}.`, ok: "Who's", bad: ["What's", "Who"], vi: `${g === "F" ? "Bạn gái" : "Bạn trai"} ấy là ai? – Đó là ${g === "F" ? "chị/em gái" : "anh/em trai"} của tớ.`, tip: "Hỏi người dùng <b>Who's</b> (= Who is)." }; } },
+  { u: 3, f: () => ({ s: "Who is he? – ___ my father.", ok: "He's", bad: ["She's", "He"], vi: "Ông ấy là ai? – Đó là bố tớ.", tip: "Con trai/đàn ông dùng <b>He's</b> (= He is)." }) },
+  { u: 3, f: () => { const w = one(["brother", "sister"]); return { s: `How many ___ do you have? – I have one ___.`, ok: `${w}s / ${w}`, bad: [`${w}s / ${w}s`, `${w} / ${w}s`], vi: `Bạn có mấy ${w === "brother" ? "anh/em trai" : "chị/em gái"}? – Tớ có một.`, tip: "Sau <b>How many</b> thêm <b>s</b>; sau <b>one</b> thì không thêm <b>s</b>." }; } },
+  { u: 4, f: () => ({ s: "Is there a lamp? – Yes, ___.", ok: "there is", bad: ["it is", "there isn't"], vi: "Có cái đèn không? – Có.", tip: "Hỏi <b>Is there…?</b> → trả lời <b>Yes, there is.</b>" }) },
+  { u: 4, f: c => { const x = c.pick(inL(["cleaning", "cooking", "sleeping"])), b = x.en.replace(/ing$/, ""); return { s: `What's your mother doing? – She's ___.`, ok: x.en, bad: [b, "in the kitchen"], vi: `Mẹ bạn đang làm gì? – Mẹ ${x.vi}.`, tip: "Hỏi <b>doing</b> → trả lời việc đang làm có đuôi <b>ing</b>." }; } },
+  { u: 4, f: () => ({ s: "___ is she doing? – She's sleeping.", ok: "What", bad: ["Where", "Who"], vi: "Cô ấy đang làm gì? – Cô ấy đang ngủ.", tip: "Hỏi đang làm gì dùng <b>What … doing</b>." }) },
+  { u: 5, f: c => { const x = c.pick(inL(CLOTHES)); return { s: `What are you wearing? – I'm ___ ${wear(x.en)}.`, ok: "wearing", bad: ["wear", "wears"], vi: `Bạn đang mặc gì? – Tớ đang mặc ${x.vi}.`, tip: "<b>I'm</b> + việc đang làm có đuôi <b>ing</b>." }; } },
+  { u: 5, f: () => ({ s: "What's that? – ___ a hat.", ok: "It's", bad: ["They're", "It"], vi: "Kia là cái gì? – Đó là cái mũ.", tip: "Một vật → <b>It's</b> (= It is)." }) },
+  { u: 5, f: () => ({ s: "What are those? – ___ socks.", ok: "They're", bad: ["It's", "They"], vi: "Kia là những cái gì? – Đó là đôi tất.", tip: "Nhiều vật → <b>They're</b> (= They are)." }) },
+  { u: 6, f: c => { const x = c.pick(inL(TOYS)); return { s: `I ___ ${an(x.en)}.`, ok: "want", bad: ["wants", "wanting"], vi: `Tớ muốn ${x.vi}.`, tip: "<b>I</b> + <b>want</b> (không thêm s)." }; } },
+  { u: 6, f: () => ({ s: "She ___ a doll.", ok: "wants", bad: ["want", "wanting"], vi: "Cô ấy muốn một con búp bê.", tip: "<b>She / He</b> + <b>wants</b> (thêm s)." }) },
+  { u: 6, f: c => { const x = c.pick(inL(["ball", "bike", "car", "kite", "train", "truck", "doll", "robot"])); return { s: "What are these? – They're ___.", ok: plural(x.en), bad: [x.en, an(x.en)], vi: `Đây là những cái gì? – Đó là những ${x.vi}.`, tip: "<b>They're</b> → tên vật thêm <b>s</b>." }; } },
+  { u: 7, f: () => { const a = one(["run", "jump", "walk"]); return { s: `Can you ${a}? – Yes, ___.`, ok: "I can", bad: ["I can't", "I do"], vi: `Bạn ${ACT_VI[a]} được không? – Được chứ.`, tip: "Hỏi <b>Can you…?</b> → trả lời <b>Yes, I can.</b>" }; } },
+  { u: 7, f: c => { const x = c.pick(inL(["eye", "ear", "hand", "leg"])); return { s: `I have two ___.`, ok: plural(x.en), bad: [x.en, an(x.en)], vi: `Tớ có hai ${x.vi}.`, tip: "Sau số <b>two</b>, tên vật thêm <b>s</b>." }; } },
+  { u: 7, f: () => ({ s: "She ___ long hair.", ok: "has", bad: ["have", "having"], vi: "Cô ấy có mái tóc dài.", tip: "<b>She / He</b> + <b>has</b>; <b>I</b> + <b>have</b>." }) },
+  { u: 8, f: c => { const x = c.pick(inL(FOOD_M)); return { s: `Do you like ${x.en}? – Yes, ___.`, ok: "I do", bad: ["I am", "I does"], vi: `Bạn có thích ${x.vi} không? – Có.`, tip: "Hỏi <b>Do you…?</b> → trả lời <b>Yes, I do.</b>" }; } },
+  { u: 8, f: () => ({ s: "I don't ___ fish.", ok: "like", bad: ["likes", "liking"], vi: "Tớ không thích cá.", tip: "<b>I don't</b> + <b>like</b> (không thêm s)." }) },
+  { u: 8, f: c => { const x = c.pick(inL(["apple", "egg"])); return { s: `I want ___ ${x.en}.`, ok: "an", bad: ["a", "two"], vi: `Tớ muốn một ${x.vi}.`, tip: TIP_AN }; } },
 ];
 /* Câu đọc Yes/No: yes = tranh khớp với câu, ngược lại tranh bị đổi sang thứ khác / số lượng khác.
    vi = nghĩa câu, see = tranh thật sự vẽ gì (gợi ý mức cuối) */
@@ -1571,16 +1596,6 @@ function genVocA(c, art) {
   ];
   return it;
 }
-function genVocB(c) {
-  const x = c.pick(isImg), list = shuffle([x, ...c.pickN(2, isImg, [x])]);
-  const it = { q: esc(x.en), opts: list.map(w => pic(w.e)), ans: list.indexOf(x), sig: x.en };
-  it.hints = [
-    { t: "Con nghe từ này nhé.", say: x.en },
-    { t: `Nghĩa tiếng Việt: <b lang="vi">${esc(x.vi)}</b>.` },
-    cutHint(it),
-  ];
-  return it;
-}
 /* Writing: điền chữ cái còn thiếu; phương án nhiễu là chữ dễ nhầm (b/d/p, m/n…) và không tạo thành từ khác */
 const LOOKALIKE = { a: "eou", b: "dp", c: "ks", d: "bp", e: "ai", f: "vt", g: "jq", h: "nk", i: "ey", j: "g", k: "cg", l: "ri", m: "nw", n: "mu", o: "au", p: "bq", q: "gp", r: "lw", s: "cz", t: "fd", u: "on", v: "fw", w: "vm", x: "ks", y: "iv", z: "s" };
 function genWrite(c) {
@@ -1607,30 +1622,42 @@ function many(n, gen) {
   }
   return out;
 }
-const K = "ABCDEFG";
+const K = "ABCDEFGH";
 const SECS = [["pho", "Phonetics"], ["voc", "Vocabulary"], ["gra", "Grammar"], ["rea", "Reading"], ["wri", "Writing"]];
 
 function makeExam(eow, sg) {
   const c = examCtx(eow, sg);
   const qHint = r => ({ t: `Câu hỏi nghĩa là: <b lang="vi">${esc(r.vi)}</b>`, say: r.q });
   const gram = () => {
-    const r = pickT(c, G).f(c); if (r.ok === r.bad) return null;
-    const o = shuffle([r.ok, r.bad]), it = { pic: r.pic, q: r.q, opts: o, ans: o.indexOf(r.ok), sig: r.q + r.ok };
+    const r = pickT(c, G).f(c), bad = sample([...new Set(r.bad)].filter(b => b !== r.ok), 2);
+    if (bad.length < 2) return null;
+    const o = shuffle([r.ok, ...bad]), it = { pic: r.pic, q: r.q, opts: o, ans: o.indexOf(r.ok), sig: r.q + r.ok };
     it.hints = [qHint(r), { t: r.tip }, cutHint(it)];
     return it;
   };
   const pho = many(7, () => genPho(c));
   const vocA = many(7, i => genVocA(c, i === 3 || i === 6));
-  const vocB = many(7, () => genVocB(c));
-  const gra = many(8, gram);
-  // Nối: ví dụ + 5 câu, thêm 1 câu trả lời thừa; mỗi câu trả lời khác nhau để chỉ có một cách nối đúng
-  const mt = many(7, () => { const r = pickT(c, G).f(c); return { ...r, sig: r.ok }; });
-  const answers = [mt[0].ok, ...shuffle(mt.slice(1).map(x => x.ok))];
-  const match = mt.slice(0, 6).map(r => {
-    const it = { pic: r.pic, q: r.q, opts: answers.map((_, j) => K[j]), ans: answers.indexOf(r.ok) };
-    // Mức 3: gạch hết, chỉ để lại đáp án đúng và một đáp án sai (ví dụ A đã dùng cũng bị gạch)
+  // Bài 3: khung 8 từ (A là ví dụ), 7 tranh, thừa 1 từ; viết chữ cái của từ đúng vào ô dưới tranh
+  // Tối đa 2 từ chỉ màu để tranh đa dạng
+  const bk = [];
+  for (let i = 0; i < 8; i++) bk.push(c.pick(x => isPic(x) && !x.e.startsWith("num:") && (!isColor(x) || bk.filter(isColor).length < 2), bk));
+  const bAns = [label(bk[0]), ...shuffle(bk.slice(1).map(label))];
+  const vocB = bk.slice(0, 7).map(x => {
+    const it = { pic: P.one(x), opts: bAns.map((_, j) => K[j]), ans: bAns.indexOf(label(x)) };
     const cut = wrongOf(it).slice(1);
-    it.hints = [qHint(r), { t: r.tip }, { t: `Con chỉ còn chọn giữa <b>${it.opts.filter((_, j) => !cut.includes(j)).join("</b> và <b>")}</b> thôi.`, cut }];
+    it.hints = [
+      { t: `Tranh là: <b lang="vi">${esc(x.vi)}</b>.` },
+      { t: `Từ tiếng Anh bắt đầu bằng chữ <b>${x.en[0].toUpperCase()}</b>.` },
+      { t: `Con chỉ còn chọn giữa <b>${it.opts.filter((_, j) => !cut.includes(j)).join("</b> và <b>")}</b> thôi.`, cut },
+    ];
+    return it;
+  });
+  const gra = many(8, gram);
+  // Điền chỗ trống: ví dụ + 5 câu, 3 phương án
+  const gap = many(6, () => {
+    const r = pickT(c, GF).f(c), o = shuffle([r.ok, ...r.bad]);
+    const it = { q: r.s, opts: o, ans: o.indexOf(r.ok), sig: r.s + r.ok };
+    it.hints = [{ t: `Câu nghĩa là: <b lang="vi">${esc(r.vi)}</b>` }, { t: r.tip }, cutHint(it)];
     return it;
   });
   const yes = [true, ...shuffle([true, true, false, false, Math.random() < .5])];
@@ -1646,9 +1673,9 @@ function makeExam(eow, sg) {
   const parts = [
     { sec: "pho", head: "I. Phonetics", no: 1, en: "Look at the pictures and sounds. CIRCLE the correct answers.", vi: "Đọc âm, khoanh vào tranh có âm đó ở đầu từ.", lay: "pics", items: pho },
     { sec: "voc", head: "II. Vocabulary", no: 2, en: "Look at the pictures. CIRCLE the correct answers.", vi: "Nhìn tranh, khoanh vào từ đúng.", lay: "words", items: vocA },
-    { sec: "voc", no: 3, en: "Read, look and CIRCLE the correct answers.", vi: "Đọc từ, khoanh vào tranh đúng.", lay: "pics", items: vocB },
+    { sec: "voc", no: 3, en: "Look, read, and WRITE letters in the boxes. There is an extra answer.", vi: "Nhìn tranh, đọc từ trong khung, viết chữ cái của từ đúng vào ô dưới tranh. Có một từ thừa.", lay: "bank", items: vocB, answers: bAns },
     { sec: "gra", head: "III. Grammar", no: 4, en: "Look and read. CIRCLE the correct answers.", vi: "Nhìn tranh, đọc câu hỏi, khoanh câu trả lời đúng.", lay: "qa", items: gra },
-    { sec: "gra", no: 5, en: "Read. MATCH the questions with the answers.", vi: "Nối câu hỏi với câu trả lời: chọn chữ cái của câu trả lời.", lay: "match", items: match, answers },
+    { sec: "gra", no: 5, en: "Read and CIRCLE the correct answers.", vi: "Đọc câu, chọn từ đúng điền vào chỗ trống.", lay: "gap", items: gap },
     { sec: "rea", head: "IV. Reading", no: 6, en: "Look and read. CIRCLE the correct answer.", vi: "Nhìn tranh, đọc câu. Câu đúng với tranh chọn Yes, sai chọn No.", lay: "yn", items: rea },
     { sec: "wri", head: "V. Writing", no: 7, en: "Look. CIRCLE the correct answer. WRITE.", vi: "Nhìn tranh, chọn chữ cái còn thiếu trong từ.", lay: "write", items: wri, pts: 2 },
   ];
@@ -1691,8 +1718,8 @@ function examSetup() {
       <b>Đề gồm 5 phần như đề ở trường</b>
       <div class="plan">
         <div><b>Phonetics · 6 điểm</b>Âm chữ cái (Sounds Great) với tranh từ vựng cả 2 sách</div>
-        <div><b>Vocabulary · 12 điểm</b>Nhìn tranh chọn từ, đọc từ chọn tranh</div>
-        <div><b>Grammar · 12 điểm</b>Mẫu câu Explore Our World: chọn câu trả lời và nối</div>
+        <div><b>Vocabulary · 12 điểm</b>Nhìn tranh chọn từ, nhìn tranh viết chữ cái của từ trong khung</div>
+        <div><b>Grammar · 12 điểm</b>Mẫu câu Explore Our World: chọn câu trả lời đúng, điền từ vào chỗ trống</div>
         <div><b>Reading · 5 điểm</b>Đọc câu, xem tranh, chọn Yes/No</div>
         <div><b>Writing · 10 điểm</b>Chọn chữ cái còn thiếu trong từ</div>
       </div>
@@ -1709,7 +1736,6 @@ function examSetup() {
   document.getElementById("make").onclick = () => go(() => examPage(makeExam(EXAM.eow, EXAM.sg)));
 }
 
-let examRO = null;
 function examPage(T) {
   document.title = "Practice Test · Lớp 1";
   const items = T.parts.flatMap(p => p.items), real = items.filter(i => !i.ex);
@@ -1733,43 +1759,36 @@ function examPage(T) {
   const markHtml = it => {
     const hl = it.hl || 0;
     const hb = it.ex || !it.hints ? "" : T.done ? (hl ? `<span class="hu" title="Số gợi ý đã dùng">💡${hl}</span>` : "")
-      : `<button class="hintb noprint" data-h="${it.id}"${hl >= 3 ? " disabled" : ""} aria-label="Gợi ý (đã dùng ${hl}/3)">💡 Gợi ý <i>${hl}/3</i></button>`;
+      : `<button class="hintb noprint" data-h="${it.id}"${hl >= 3 ? " disabled" : ""} aria-label="Gợi ý (đã dùng ${hl}/3)">💡<span class="ht"> Gợi ý</span> <i>${hl}/3</i></button>`;
     return hb + (it.ex ? `<span class="exb">Ví dụ</span>` : T.done ? (it.sel === it.ans ? `<span class="mk ok" aria-label="Đúng">✓</span>` : `<span class="mk no" aria-label="Sai">✗</span>`) : "");
   };
 
-  /* Bài nối (Grammar 5): câu hỏi cột trái, câu trả lời cột phải, nối bằng đường kẻ.
-     Chạm một câu hỏi rồi chạm câu trả lời (hoặc ngược lại). MS = ô đang chọn dở. Đáp án bị gợi ý gạch chỉ hiện khi đang chọn câu đó. */
-  const MS = { q: null, a: null };
-  const matchHtml = (p, pi) => {
-    const act = MS.q != null ? byId[MS.q] : null, cut = act ? cutOf(act) : [];
+  // Ô đang chọn dở của bài khung từ: q = câu (tranh), a = từ trong khung, pi = bài
+  const MS = { q: null, a: null, pi: null };
+  /* Bài khung từ (Vocabulary 3): chạm tranh rồi chạm từ trong khung (hoặc ngược lại) để điền chữ cái vào ô.
+     Dùng chung MS và cách xử lý chạm với bài nối (data-mq = câu, data-ma = đáp án). Gợi ý của câu đang chọn hiện dưới các tranh. */
+  const bankHtml = (p, pi) => {
+    const act = MS.q != null && partOf[MS.q] === p ? byId[MS.q] : null, cut = act ? cutOf(act) : [];
     const used = new Map(p.items.filter(i => i.sel != null).map(i => [i.sel, i]));
-    const left = p.items.map(it => `<div class="mq${it.ex ? " ex" : ""}${MS.q === it.id ? " on" : ""}${it.sel != null ? " linked" : ""}" data-mq="${it.id}"${it.ex || T.done ? "" : ` role="button" tabindex="0" aria-pressed="${MS.q === it.id}"`}>
-        <div class="qhead"><span class="qn">${it.ex ? 0 : it.n}.</span>${it.pic ? `<span class="qp">${it.pic}</span>` : ""}${markHtml(it)}</div>
-        <div class="qt">${esc(it.q)}</div>${hintsHtml(it)}<span class="dot"></span></div>`).join("");
-    const right = p.answers.map((a, j) => {
-      const u = used.get(j), x = !T.done && cut.includes(j);
-      return `<button class="ma${MS.a === j ? " on" : ""}${u ? " linked" : ""}${x ? " cut" : ""}" data-ma="${j}" aria-pressed="${MS.a === j}"${T.done || (u && u.ex) || x ? " disabled" : ""}><span class="dot"></span><span class="k">${K[j]}</span><span>${esc(a)}</span></button>`;
+    const bank = p.answers.map((a, j) => {
+      const u = used.get(j), x = !T.done && cut.includes(j), on = MS.pi === pi && MS.a === j;
+      return `<button class="wb${on ? " on" : ""}${u ? (u.ex ? " ex" : " used") : ""}${x ? " cut" : ""}" data-ma="${j}" aria-pressed="${on}"${T.done || (u && u.ex) || x ? " disabled" : ""}><b>${K[j]}</b> – ${esc(a)}</button>`;
     }).join("");
-    return `<div class="mgrid" data-mg="${pi}"><div class="mcol">${left}</div><div class="mcol">${right}</div><svg class="mlines" aria-hidden="true"></svg></div>`;
+    const tiles = p.items.map(it => {
+      const res = T.done && !it.ex ? (it.sel === it.ans ? " right" : " wrong") : "";
+      return `<div class="bq${it.ex ? " ex" : ""}${act === it ? " on" : ""}${res}" data-mq="${it.id}"${it.ex || T.done ? "" : ` role="button" tabindex="0" aria-pressed="${act === it}" aria-label="Câu ${it.n}"`}>
+        <span class="qp">${it.pic}</span>
+        <span class="brow"><span class="qn">${it.ex ? 0 : it.n}.</span><span class="bbox">${it.sel != null ? K[it.sel] : ""}</span>${res === " wrong" ? `<span class="bfix" title="Đáp án đúng">${K[it.ans]}</span>` : ""}</span>
+        ${it.ex ? "" : markHtml(it)}</div>`;
+    }).join("");
+    const hint = act && act.hl ? `<div class="bhint noprint"><p class="xmeta">Gợi ý câu ${act.n}</p>${hintsHtml(act)}</div>` : "";
+    return `<div class="bankp" data-mg="${pi}"><div class="wbank">${bank}</div><div class="bgrid">${tiles}</div>${hint}</div>`;
   };
-  const drawLines = g => {
-    const p = T.parts[g.dataset.mg], r = g.getBoundingClientRect(), svg = g.querySelector(".mlines");
-    const pt = el => { const d = el.querySelector(".dot").getBoundingClientRect(); return [d.left + d.width / 2 - r.left, d.top + d.height / 2 - r.top]; };
-    const ln = (it, j, cls) => {
-      const [x1, y1] = pt(g.querySelector(`[data-mq="${it.id}"]`)), [x2, y2] = pt(g.querySelector(`[data-ma="${j}"]`)), m = (x2 - x1) / 2;
-      return `<path class="${cls}" d="M${x1} ${y1}C${x1 + m} ${y1} ${x2 - m} ${y2} ${x2} ${y2}"/>`;
-    };
-    svg.setAttribute("viewBox", `0 0 ${r.width} ${r.height}`);
-    svg.innerHTML = p.items.map(it => it.ex ? ln(it, it.ans, "ex")
-      : !T.done ? (it.sel != null ? ln(it, it.sel, "") : "")
-      : it.sel === it.ans ? ln(it, it.ans, "ok") : (it.sel != null ? ln(it, it.sel, "no") : "") + ln(it, it.ans, "fix")).join("");
-  };
-  const paintMatch = pi => {
-    const g = $app.querySelector(`.mgrid[data-mg="${pi}"]`), f = document.activeElement;
+  const paintBank = pi => {
+    const g = $app.querySelector(`[data-mg="${pi}"]`), f = document.activeElement, p = T.parts[pi];
     const fk = f && g.contains(f) ? (f.dataset.mq != null ? `[data-mq="${f.dataset.mq}"]` : f.dataset.ma != null ? `[data-ma="${f.dataset.ma}"]` : null) : null;
-    g.outerHTML = matchHtml(T.parts[pi], pi);
-    const ng = $app.querySelector(`.mgrid[data-mg="${pi}"]`);
-    drawLines(ng);
+    g.outerHTML = bankHtml(p, pi);
+    const ng = $app.querySelector(`[data-mg="${pi}"]`);
     if (fk) { const el = ng.querySelector(fk); if (el && !el.disabled) el.focus(); }
   };
 
@@ -1788,6 +1807,11 @@ function examPage(T) {
       const w = it.word;
       head = `${num}${qp}<span class="qt word">${esc(w.slice(0, it.at))}<span class="blank">${it.sel == null ? "&nbsp;" : it.opts[it.sel]}</span>${esc(w.slice(it.at + 1))}</span>`;
       chs = `<div class="chs c3">${it.opts.map((o, j) => btn(j, `<span>${o}</span>`, " big")).join("")}</div>`;
+    } else if (p.lay === "gap") {
+      // Chỗ trống hiện phần con đã chọn ("x / y" điền lần lượt vào hai chỗ trống)
+      const fill = it.sel == null ? [] : it.opts[it.sel].split(" / ");
+      head = `${num}<span class="qt">${esc(it.q).split("___").map((t, k) => k ? `<span class="blank gap">${fill[k - 1] ? esc(fill[k - 1]) : "&nbsp;"}</span>${t}` : t).join("")}</span>`;
+      chs = `<div class="chs c3">${it.opts.map((o, j) => btn(j, `<span>${esc(o)}</span>`)).join("")}</div>`;
     } else {
       head = `${num}${qp}<span class="qt">${esc(it.q)}</span>`;
       chs = `<div class="chs${p.lay === "yn" ? " c2" : ""}">${it.opts.map((o, j) => btn(j, `<span>${esc(o)}</span>`)).join("")}</div>`;
@@ -1797,7 +1821,7 @@ function examPage(T) {
   const partHtml = (p, pi) => `<section class="paper">
     ${p.head ? `<div class="sec-h"><h3>${p.head}</h3></div>` : ""}
     <p class="instr">${p.no}. ${p.en} There is one example. <span class="pts">(${T.done ? score(p.items) : "……"}/${maxOf(p.items)} pts)</span>${S.vi ? `<small>${p.vi}</small>` : ""}</p>
-    ${p.lay === "match" ? matchHtml(p, pi) : p.items.map(it => qHtml(p, it)).join("")}
+    ${p.lay === "bank" ? bankHtml(p, pi) : p.items.map(it => qHtml(p, it)).join("")}
   </section>`;
 
   $app.innerHTML = `
@@ -1818,13 +1842,6 @@ function examPage(T) {
         : `<span class="xmeta" id="cnt"></span><button class="btn primary" id="submit" style="font-size:20px;padding:12px 26px">✅ Nộp bài</button>`}</div>
     </div>`;
 
-  // Vẽ lại đường nối khi khung đổi cỡ (xoay máy, mở gợi ý, phông chữ tải xong)
-  const redraw = () => $app.querySelectorAll(".mgrid").forEach(drawLines);
-  if (examRO) examRO.disconnect();
-  examRO = new ResizeObserver(redraw);
-  examRO.observe(document.getElementById("exam"));
-  redraw();
-  if (document.fonts) document.fonts.ready.then(redraw);
   const sayHint = (it, k) => speakSeq(hintSegs(it.hints[k]));
   if (T.done) $app.querySelector("#exam").addEventListener("click", e => {
     const sb = e.target.closest(".say[data-hs]");
@@ -1870,17 +1887,18 @@ function examPage(T) {
       it.hl = hl + 1;
       const h = it.hints[hl], p = partOf[it.id];
       if (h.cut && h.cut.includes(it.sel)) it.sel = null;
-      if (p.lay === "match") { MS.q = it.id; MS.a = null; paintMatch(T.parts.indexOf(p)); }
+      if (p.lay === "bank") { MS.q = it.id; MS.a = null; MS.pi = T.parts.indexOf(p); paintBank(MS.pi); }
       else hb.closest(".q").outerHTML = qHtml(p, it);
       sayHint(it, hl);
       count();
       return;
     }
-    const mq = e.target.closest(".mq[data-mq]"), ma = e.target.closest(".ma[data-ma]");
+    const mq = e.target.closest("[data-mq]"), ma = e.target.closest("[data-ma]");
     if (mq || ma) {
       const it = mq && byId[mq.dataset.mq], j = ma ? +ma.dataset.ma : null;
-      if ((it && it.ex) || (ma && ma.disabled)) return;
-      const pi = +(mq || ma).closest(".mgrid").dataset.mg, p = T.parts[pi];
+      if ((it && it.ex) || (ma && ma.disabled) || T.done) return;
+      const pi = +(mq || ma).closest("[data-mg]").dataset.mg, p = T.parts[pi];
+      if (MS.pi !== pi) { MS.q = MS.a = null; MS.pi = pi; }   // đang chọn dở ở bài khác thì bỏ
       if (it) {
         if (MS.a != null) link(p, it, MS.a);
         else MS.q = MS.q === it.id ? null : it.id;
@@ -1889,7 +1907,7 @@ function examPage(T) {
         if (q) { if (q.sel === j) { q.sel = null; MS.q = null; } else link(p, q, j); }
         else MS.a = MS.a === j ? null : j;
       }
-      paintMatch(pi);
+      paintBank(pi);
       count();
       return;
     }
@@ -1898,12 +1916,13 @@ function examPage(T) {
     const it = byId[b.dataset.q];
     it.sel = +b.dataset.j;
     b.parentElement.querySelectorAll(".ch").forEach(x => x.setAttribute("aria-pressed", x === b));
+    if (partOf[it.id].lay === "gap") { b.closest(".q").outerHTML = qHtml(partOf[it.id], it); count(); return; }
     const blank = b.closest(".q").querySelector(".blank");
     if (blank) blank.textContent = it.opts[it.sel];
     count();
   };
   document.getElementById("exam").onkeydown = e => {
-    if ((e.key === "Enter" || e.key === " ") && e.target.matches(".mq[role=button]")) { e.preventDefault(); e.target.click(); }
+    if ((e.key === "Enter" || e.key === " ") && e.target.matches("[data-mq][role=button]")) { e.preventDefault(); e.target.click(); }
   };
   document.getElementById("submit").onclick = async () => {
     const left = real.filter(i => i.sel == null).length;
