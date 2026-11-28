@@ -279,6 +279,12 @@ button:focus-visible { outline: 3px solid var(--sky); outline-offset: 3px; }
 .aopt .play small { font-family: var(--display); font-weight: 800; font-size: 18px; color: var(--muted); }
 .aopt .play.on { border-color: var(--sun); background: var(--bg); }
 .opt.pickb { min-height: 52px; padding: 6px; font-family: var(--display); font-weight: 800; font-size: 18px; }
+.rletters.miss .gap { min-width: .62em; border-bottom: 4px dashed var(--muted); color: var(--leaf); }
+.rletters.miss .gap.now { border-bottom-style: solid; border-color: var(--sun); background: var(--bg); border-radius: 8px 8px 0 0; }
+.rletters.miss .gap.fill { border-bottom-style: solid; border-color: var(--leaf); }
+.rletters.miss.done span { color: var(--leaf); }
+.ltiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(64px, 1fr)); gap: 10px; max-width: 460px; margin: 0 auto; }
+.opt.ltile { min-height: 72px; padding: 4px; font-family: var(--display); font-weight: 800; font-size: clamp(32px, 9vw, 42px); }
 .opt .wlab { font-family: var(--display); font-weight: 800; font-size: 20px; color: var(--leaf); overflow-wrap: anywhere; }
 .picks { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 150px), 1fr)); gap: 8px; margin-bottom: 18px; }
 .pick { text-align: left; border: 2px solid var(--line); background: var(--card); border-radius: 14px; padding: 8px 12px; box-shadow: var(--shadow); min-width: 0; }
@@ -1142,6 +1148,8 @@ function caseMem(u) {
      hộp 0–1 →                             đọc từ, chọn hình                   nghe, chọn từ
      hộp 2–3 →                             nhìn hình, chọn từ                  đọc từ, chọn tiếng đọc đúng
      hộp ≥ 4 → nhìn nhanh 1,5 giây rồi:   chọn hình                          chọn tiếng đọc đúng
+     xen kẽ mọi mức → điền chữ còn thiếu:  nhìn hình                          nghe đọc
+       (thiếu 1 chữ ở hộp 0–1, 2 chữ ở hộp 2–3, 3 chữ ở hộp ≥ 4)
    Phương án nhiễu luôn là từ có mặt chữ giống từ đúng (cùng chữ đầu, chữ cuối, độ dài) để bé phải nhìn cả từ. */
 const RD_GAP = [0, 1, 2, 4, 7, 14, 30];   // số ngày tới lần ôn sau, theo hộp
 const RD_KNOWN = 4;                       // từ hộp này trở lên coi như đã thuộc
@@ -1203,6 +1211,7 @@ function readHome() {
         <div><b>🔊 Chữ với tiếng đọc</b>Làm quen từ mới bằng tiếng đọc → nghe chọn từ → đọc từ chọn tiếng đọc đúng. Không có tranh.</div>
         <div><b>🎯 Từ na ná nhau</b>Các phương án trông giống nhau (book, black, baby) nên con phải nhìn kỹ cả từ</div>
         <div><b>⚡ Nhìn nhanh</b>Từ đã thuộc chỉ hiện 1,5 giây để con đọc nhanh hơn</div>
+        <div><b>🧩 Điền chữ còn thiếu</b>Từ bị che 1 đến 3 chữ, con nhìn hình hoặc nghe đọc rồi chọn chữ cái điền vào. Từ càng thuộc càng thiếu nhiều chữ.</div>
       </div>
       <p class="xmeta">Mỗi câu chữ chỉ đi với tranh hoặc với tiếng đọc, không có cả hai, để con nhớ mặt chữ chứ không đoán theo tranh. Bấm 👀 Xem lại ở bài nhìn nhanh thì từ đó chưa được tính là thuộc. Phạm vi từ:</p>
       ${scopeHtml()}
@@ -1223,7 +1232,11 @@ function readSession() {
   // Mỗi từ trong lượt chỉ đi với MỘT yếu tố: tranh (P) hoặc tiếng đọc (A), chia đều hai nhánh
   const mods = shuffle(list.map((_, i) => i % 2 ? "A" : "P"));
   const lvl = x => !st[x.en] || st[x.en].b < 2 ? 0 : st[x.en].b < RD_KNOWN ? 1 : 2;
-  const steps = shuffle(list.map((x, i) => ({ x, m: mods[i], k: RD_K[mods[i]][lvl(x)] })));
+  // Khoảng 1/3 số câu là dạng điền chữ còn thiếu, số chữ thiếu tăng theo mức (1–3)
+  const steps = shuffle(list.map((x, i) => {
+    const m = mods[i], l = lvl(x), miss = Math.random() < RD_MISS && missSlots(x.en, l + 1).length;
+    return miss ? { x, m, k: "miss" + m, n: l + 1 } : { x, m, k: RD_K[m][l] };
+  }));
   // Từ mới: thẻ làm quen (cùng nhánh) trước, câu hỏi nằm cách đó vài bước
   for (const x of fresh) {
     const i = steps.findIndex(s => s.x === x);
@@ -1234,6 +1247,25 @@ function readSession() {
 
 // Dạng bài theo nhánh và mức (hộp 0–1, 2–3, ≥4)
 const RD_K = { P: ["read", "pick", "flashP"], A: ["hear", "match", "flashA"] };
+const RD_MISS = .35;                       // tỉ lệ câu điền chữ còn thiếu
+// Chọn vị trí các chữ bị che: chỉ che chữ cái, luôn chừa lại ít nhất 2 chữ để bé nhận ra từ
+function missSlots(w, n) {
+  const pos = [...w].map((c, i) => /[a-z]/i.test(c) ? i : -1).filter(i => i >= 0);
+  n = Math.min(n, pos.length - 2);
+  if (n < 1) return [];
+  return shuffle(pos).slice(0, n).sort((a, b) => a - b);
+}
+// Chữ cái nhiễu: chữ hay nhầm với chữ đúng, chữ của các từ na ná, rồi nguyên âm
+const LOOKS_LIKE = { b: "dph", d: "bpq", p: "qbd", q: "pd", m: "nw", n: "mu", u: "nv", w: "mv", a: "eo", e: "ac", o: "ae", i: "lj", l: "it", h: "nb", c: "eo", g: "qy", y: "gv", s: "z", t: "fl", f: "t", r: "n", k: "h", v: "uw" };
+function missTiles(need, x, pool) {
+  const out = [...new Set(need)], want = Math.min(6, Math.max(4, out.length + 3));
+  const cand = [...need.map(c => LOOKS_LIKE[c] || "").join(""), ...lookalikes(x, pool, 3).map(o => o.en.toLowerCase()).join(""), ..."aeiou", ..."rstnlmbdpc"];
+  for (const c of shuffle(cand.filter(c => /[a-z]/.test(c))).sort((a, b) => (need.some(n => (LOOKS_LIKE[n] || "").includes(b)) ? 1 : 0) - (need.some(n => (LOOKS_LIKE[n] || "").includes(a)) ? 1 : 0))) {
+    if (out.length >= want) break;
+    if (!out.includes(c)) out.push(c);
+  }
+  return shuffle(out);
+}
 const RD_SAY = {
   introP: "Từ mới. Con nhìn tranh và nhìn kỹ từng chữ nhé.",
   introA: "Từ mới. Con nghe đọc và chỉ tay theo từng chữ nhé.",
@@ -1243,11 +1275,13 @@ const RD_SAY = {
   hear: "Con nghe, rồi chọn từ đúng.",
   match: "Con đọc từ này. Bấm từng loa để nghe, rồi chọn tiếng đọc đúng.",
   flashA: "Từ sẽ hiện thật nhanh. Con đọc rồi chọn tiếng đọc đúng.",
+  missP: "Từ bị thiếu chữ. Con nhìn hình, rồi chọn chữ còn thiếu.",
+  missA: "Từ bị thiếu chữ. Con nghe, rồi chọn chữ còn thiếu.",
 };
 function readRun(R) {
   const back = () => go(readHome);
   if (R.i >= R.steps.length) return readDone(R);
-  const { x, m, k, retry } = R.steps[R.i];
+  const { x, m, k, retry, n } = R.steps[R.i];
   const top = `<div class="game-top"><button class="btn back" id="back" aria-label="Quay lại">←</button><div class="dots">${R.steps.map((_, j) => `<i class="${j < R.i ? "done" : j === R.i ? "now" : ""}"></i>`).join("")}</div></div>`;
   const next = () => { R.i++; go(() => readRun(R)); };
   // Lần đầu gặp mỗi dạng trong lượt: đọc hướng dẫn bằng tiếng Việt (onend: đọc xong thì làm tiếp)
@@ -1272,7 +1306,52 @@ function readRun(R) {
     return;
   }
 
-  const others = lookalikes(x, R.pool.length > 8 ? R.pool : examCtx(EXAM.eow, EXAM.sg).all.filter(isPic), 2);
+  // Cập nhật hộp của từ (lượt làm lại trong buổi không tính lên hộp)
+  const record = (wrong, helped) => {
+    if (retry) return;
+    R.asked++;
+    const st = rdState(), s = st[x.en] || { b: 0, bad: 0 };
+    if (!wrong && !helped) { R.firstOk++; s.b = Math.min(s.b + 1, RD_GAP.length - 1); }
+    else if (wrong) { s.b = 0; s.bad = (s.bad || 0) + 1; }
+    s.due = today() + (wrong || helped ? 1 : RD_GAP[s.b]);
+    st[x.en] = s; store.set("r:words", st);
+    if (wrong) { R.again.add(x.en); R.steps.push({ x, m, k: RD_K[m][0], retry: true }); }
+  };
+  const optPool = R.pool.length > 8 ? R.pool : examCtx(EXAM.eow, EXAM.sg).all.filter(isPic);
+
+  // Điền chữ còn thiếu: nhánh tranh chỉ có hình, nhánh tiếng chỉ có tiếng đọc
+  if (k === "missP" || k === "missA") {
+    const gaps = missSlots(x.en, n || 1), need = gaps.map(i => x.en[i].toLowerCase());
+    const tiles = missTiles(need, x, optPool);
+    let at = 0, wrong = 0, locked = false;
+    const slots = [...x.en].map((c, i) => c === " " ? `<i class="sp"></i>` : gaps.includes(i) ? `<span class="gap" data-g="${i}"></span>` : `<span>${esc(c)}</span>`).join("");
+    $app.innerHTML = `${top}<div class="prompt"><h3>Chọn ${gaps.length > 1 ? `${gaps.length} chữ còn thiếu, lần lượt từ trái sang phải` : "chữ còn thiếu"}</h3>
+      ${k === "missP" ? `<div class="big">${pic(x.e)}</div>` : `<button class="speaker" id="say" aria-label="Nghe lại">🔊</button>`}
+      <div class="rletters miss">${slots}</div></div>
+      <div class="ltiles">${tiles.map(c => `<button class="opt ltile" data-c="${c}">${c}</button>`).join("")}</div>`;
+    document.getElementById("back").onclick = back;
+    const mark = () => $app.querySelectorAll(".rletters .gap").forEach((g, j) => g.classList.toggle("now", j === at));
+    mark();
+    if (k === "missA") { document.getElementById("say").onclick = () => speak(x.en); intro(() => alive("say")() && !locked && speak(x.en)); }
+    else intro();
+    $app.querySelectorAll(".ltile").forEach(b => b.onclick = () => {
+      if (locked) return;
+      if (b.dataset.c !== need[at]) { wrong++; beep(false); b.classList.remove("bad"); void b.offsetWidth; b.classList.add("bad"); return; }
+      const g = $app.querySelector(`.gap[data-g="${gaps[at]}"]`);
+      g.textContent = x.en[gaps[at]]; g.classList.add("fill");
+      at++; mark();
+      if (at < need.length) return;
+      locked = true; beep(true);
+      $app.querySelectorAll(".ltile").forEach(o => o.disabled = true);
+      $app.querySelector(".rletters").classList.add("done");
+      if (m === "A") speak(x.en);
+      record(wrong, false);
+      setTimeout(() => { if (document.body.contains(b)) next(); }, wrong ? 2000 : 1500);
+    });
+    return;
+  }
+
+  const others = lookalikes(x, optPool, 2);
   const list = shuffle([x, ...others]);
   let wrong = 0, helped = false, locked = false, prompt, opts;
   const flash = k === "flashP" || k === "flashA";
@@ -1315,16 +1394,7 @@ function readRun(R) {
     // Phản hồi giữ đúng nhánh: nhánh tranh hiện chữ dưới tranh (không đọc), nhánh tiếng đọc lại từ (không tranh)
     if (m === "P" && k !== "pick") b.insertAdjacentHTML("beforeend", `<span class="wlab">${esc(x.en)}</span>`);
     if (m === "A") speak(x.en);
-    // Cập nhật hộp của từ (lượt làm lại trong buổi không tính lên hộp)
-    if (!retry) {
-      R.asked++;
-      const st = rdState(), s = st[x.en] || { b: 0, bad: 0 };
-      if (!wrong && !helped) { R.firstOk++; s.b = Math.min(s.b + 1, RD_GAP.length - 1); }
-      else if (wrong) { s.b = 0; s.bad = (s.bad || 0) + 1; }
-      s.due = today() + (wrong || helped ? 1 : RD_GAP[s.b]);
-      st[x.en] = s; store.set("r:words", st);
-      if (wrong) { R.again.add(x.en); R.steps.push({ x, m, k: RD_K[m][0], retry: true }); }
-    }
+    record(wrong, helped);
     setTimeout(() => { if (document.body.contains(b)) next(); }, wrong ? 2000 : 1400);
   });
 }
